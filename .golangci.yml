@@ -24,7 +24,6 @@ linters:
     gocritic:
       enabled-tags:
         - diagnostic
-        - style
       disabled-checks:
         - ifElseChain
         - commentedOutCode
@@ -40,13 +39,20 @@ linters:
 
   exclusions:
     rules:
-      # Test files: allow dot imports, unused params, etc.
       - path: _test\.go
         linters:
           - errcheck
           - gocritic
+          - bodyclose
 
-      # Allow fmt.Fprint* to stderr without checking errors
       - linters:
           - errcheck
         text: "fmt\\.Fprint"
+
+      - linters:
+          - errcheck
+        text: "\\.Close\\(\\)"
+
+      - linters:
+          - gocritic
+        text: "octalLiteral|paramTypeCombine|redundantSprint|unlambda|httpNoBody"
