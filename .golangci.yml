@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 3m
 
@@ -15,7 +17,6 @@ linters:
     - misspell
     - bodyclose
     - noctx
-    - exportloopref
 
 linters-settings:
   gocritic:
