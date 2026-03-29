@@ -130,11 +130,11 @@ func runConnect(cmd *cobra.Command, args []string) error {
 	}
 
 	data := map[string]interface{}{
-		"connected":   true,
-		"environment": sess.Environment,
-		"auth_method": authenticator.Method(),
-		"company":     sess.Company,
-		"user":        sess.User,
+		"connected":    true,
+		"environment":  sess.Environment,
+		"auth_method":  authenticator.Method(),
+		"company":      sess.Company,
+		"user":         sess.User,
 		"token_expiry": sess.TokenExpiry,
 	}
 

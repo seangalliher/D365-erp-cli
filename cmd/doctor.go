@@ -25,9 +25,13 @@ type checkResult struct {
 	Suggestion string `json:"suggestion,omitempty"`
 }
 
-func pass(name, msg string) checkResult   { return checkResult{Name: name, Status: "pass", Message: msg} }
-func warn(name, msg, sug string) checkResult { return checkResult{Name: name, Status: "warn", Message: msg, Suggestion: sug} }
-func fail(name, msg, sug string) checkResult { return checkResult{Name: name, Status: "fail", Message: msg, Suggestion: sug} }
+func pass(name, msg string) checkResult { return checkResult{Name: name, Status: "pass", Message: msg} }
+func warn(name, msg, sug string) checkResult {
+	return checkResult{Name: name, Status: "warn", Message: msg, Suggestion: sug}
+}
+func fail(name, msg, sug string) checkResult {
+	return checkResult{Name: name, Status: "fail", Message: msg, Suggestion: sug}
+}
 
 func newDoctorCmd() *cobra.Command {
 	return &cobra.Command{

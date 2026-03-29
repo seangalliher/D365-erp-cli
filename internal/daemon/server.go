@@ -137,7 +137,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 	case <-s.done:
 		s.logger.Printf("shutdown requested")
 	case <-ctx.Done():
-		s.logger.Printf("context cancelled")
+		s.logger.Printf("context canceled")
 	}
 
 	return s.shutdown()

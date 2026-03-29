@@ -506,4 +506,3 @@ func resolveCompany(override string) string {
 	}
 	return GetCompany()
 }
-

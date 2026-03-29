@@ -18,20 +18,20 @@ const d365ScopeSuffix = "/.default"
 
 // Method constants for supported authentication methods.
 const (
-	MethodBrowser         = "browser"
-	MethodDeviceCode      = "device-code"
+	MethodBrowser          = "browser"
+	MethodDeviceCode       = "device-code"
 	MethodClientCredential = "client-credentials"
-	MethodAzCLI           = "az-cli"
-	MethodManagedIdentity = "managed-identity"
+	MethodAzCLI            = "az-cli"
+	MethodManagedIdentity  = "managed-identity"
 )
 
-// validMethods is the set of recognised auth method strings.
+// validMethods is the set of recognized auth method strings.
 var validMethods = map[string]bool{
-	MethodBrowser:         true,
-	MethodDeviceCode:      true,
+	MethodBrowser:          true,
+	MethodDeviceCode:       true,
 	MethodClientCredential: true,
-	MethodAzCLI:           true,
-	MethodManagedIdentity: true,
+	MethodAzCLI:            true,
+	MethodManagedIdentity:  true,
 }
 
 // TokenResult holds an OAuth access token and its expiration time.
@@ -197,9 +197,11 @@ type BrowserProvider struct {
 	// credential is the underlying azidentity.InteractiveBrowserCredential.
 	// Typed as interface{} so this package compiles without importing
 	// azidentity; the real credential is injected via the factory.
-	credential interface{ GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error) }
-	tenantID   string
-	clientID   string
+	credential interface {
+		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
+	}
+	tenantID string
+	clientID string
 }
 
 func (p *BrowserProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -210,9 +212,11 @@ func (p *BrowserProvider) Method() string { return MethodBrowser }
 // DeviceCodeProvider implements Provider using
 // azidentity.DeviceCodeCredential.
 type DeviceCodeProvider struct {
-	credential interface{ GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error) }
-	tenantID   string
-	clientID   string
+	credential interface {
+		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
+	}
+	tenantID string
+	clientID string
 }
 
 func (p *DeviceCodeProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -223,9 +227,11 @@ func (p *DeviceCodeProvider) Method() string { return MethodDeviceCode }
 // ClientCredentialProvider implements Provider using
 // azidentity.ClientSecretCredential.
 type ClientCredentialProvider struct {
-	credential interface{ GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error) }
-	tenantID   string
-	clientID   string
+	credential interface {
+		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
+	}
+	tenantID string
+	clientID string
 }
 
 func (p *ClientCredentialProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -235,7 +241,9 @@ func (p *ClientCredentialProvider) Method() string { return MethodClientCredenti
 
 // AzCLIProvider implements Provider using azidentity.AzureCLICredential.
 type AzCLIProvider struct {
-	credential interface{ GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error) }
+	credential interface {
+		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
+	}
 }
 
 func (p *AzCLIProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -246,8 +254,10 @@ func (p *AzCLIProvider) Method() string { return MethodAzCLI }
 // ManagedIdentityProvider implements Provider using
 // azidentity.ManagedIdentityCredential.
 type ManagedIdentityProvider struct {
-	credential interface{ GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error) }
-	clientID   string // optional user-assigned identity
+	credential interface {
+		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
+	}
+	clientID string // optional user-assigned identity
 }
 
 func (p *ManagedIdentityProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {

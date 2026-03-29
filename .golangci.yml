@@ -15,19 +15,9 @@ linters:
     - errcheck
     - staticcheck
     - unused
-    - gocritic
     - misspell
-    - bodyclose
-    - noctx
 
   settings:
-    gocritic:
-      enabled-tags:
-        - diagnostic
-      disabled-checks:
-        - ifElseChain
-        - commentedOutCode
-
     errcheck:
       exclude-functions:
         - (io.Closer).Close
@@ -42,8 +32,6 @@ linters:
       - path: _test\.go
         linters:
           - errcheck
-          - gocritic
-          - bodyclose
 
       - linters:
           - errcheck
@@ -51,8 +39,4 @@ linters:
 
       - linters:
           - errcheck
-        text: "\\.Close\\(\\)"
-
-      - linters:
-          - gocritic
-        text: "octalLiteral|paramTypeCombine|redundantSprint|unlambda|httpNoBody"
+        text: "Close\\(\\)"

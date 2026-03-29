@@ -1,10 +1,10 @@
 // Package config manages CLI configuration including profiles, environment
 // variables, and config files. Configuration is layered:
-//   1. Defaults (hardcoded)
-//   2. Config file (~/.d365cli/config.json)
-//   3. Profile-specific overrides
-//   4. Environment variables (D365_*)
-//   5. Command-line flags (highest priority)
+//  1. Defaults (hardcoded)
+//  2. Config file (~/.d365cli/config.json)
+//  3. Profile-specific overrides
+//  4. Environment variables (D365_*)
+//  5. Command-line flags (highest priority)
 package config
 
 import (

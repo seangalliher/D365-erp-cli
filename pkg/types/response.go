@@ -23,11 +23,11 @@ type ErrorInfo struct {
 
 // Metadata provides context about the command execution.
 type Metadata struct {
-	DurationMs int64  `json:"duration_ms"`
-	Company    string `json:"company,omitempty"`
+	DurationMs  int64  `json:"duration_ms"`
+	Company     string `json:"company,omitempty"`
 	Environment string `json:"environment,omitempty"`
-	Timestamp  string `json:"timestamp"`
-	Version    string `json:"version,omitempty"`
+	Timestamp   string `json:"timestamp"`
+	Version     string `json:"version,omitempty"`
 }
 
 // NewMetadata creates metadata with the current timestamp and a duration.
@@ -68,22 +68,22 @@ const (
 
 // Error codes used throughout the CLI.
 const (
-	ErrCodeConnection       = "CONNECTION_ERROR"
-	ErrCodeAuthentication   = "AUTH_ERROR"
-	ErrCodeValidation       = "VALIDATION_ERROR"
-	ErrCodeNotFound         = "NOT_FOUND"
-	ErrCodeConflict         = "CONFLICT"
-	ErrCodePermission       = "PERMISSION_DENIED"
-	ErrCodeTimeout          = "TIMEOUT"
-	ErrCodeServerError      = "SERVER_ERROR"
-	ErrCodeInvalidInput     = "INVALID_INPUT"
-	ErrCodeSessionRequired  = "SESSION_REQUIRED"
-	ErrCodeFormRequired     = "FORM_REQUIRED"
-	ErrCodeDaemonError      = "DAEMON_ERROR"
-	ErrCodeGuardrailBlock   = "GUARDRAIL_BLOCK"
-	ErrCodeGuardrailWarn    = "GUARDRAIL_WARN"
-	ErrCodeODataError       = "ODATA_ERROR"
-	ErrCodePluginError      = "PLUGIN_ERROR"
+	ErrCodeConnection      = "CONNECTION_ERROR"
+	ErrCodeAuthentication  = "AUTH_ERROR"
+	ErrCodeValidation      = "VALIDATION_ERROR"
+	ErrCodeNotFound        = "NOT_FOUND"
+	ErrCodeConflict        = "CONFLICT"
+	ErrCodePermission      = "PERMISSION_DENIED"
+	ErrCodeTimeout         = "TIMEOUT"
+	ErrCodeServerError     = "SERVER_ERROR"
+	ErrCodeInvalidInput    = "INVALID_INPUT"
+	ErrCodeSessionRequired = "SESSION_REQUIRED"
+	ErrCodeFormRequired    = "FORM_REQUIRED"
+	ErrCodeDaemonError     = "DAEMON_ERROR"
+	ErrCodeGuardrailBlock  = "GUARDRAIL_BLOCK"
+	ErrCodeGuardrailWarn   = "GUARDRAIL_WARN"
+	ErrCodeODataError      = "ODATA_ERROR"
+	ErrCodePluginError     = "PLUGIN_ERROR"
 )
 
 // ExitCodeForError returns the appropriate process exit code for an error code.
@@ -131,11 +131,11 @@ type EntityField struct {
 
 // EntityMetadata contains the full metadata for an OData entity.
 type EntityMetadata struct {
-	EntitySetName  string                 `json:"entity_set_name"`
-	Fields         []EntityField          `json:"fields,omitempty"`
-	Keys           []string               `json:"keys,omitempty"`
-	EnumValues     map[string][]EnumValue `json:"enum_values,omitempty"`
-	Relationships  []Relationship         `json:"relationships,omitempty"`
+	EntitySetName string                 `json:"entity_set_name"`
+	Fields        []EntityField          `json:"fields,omitempty"`
+	Keys          []string               `json:"keys,omitempty"`
+	EnumValues    map[string][]EnumValue `json:"enum_values,omitempty"`
+	Relationships []Relationship         `json:"relationships,omitempty"`
 }
 
 // EnumValue represents a single enum member.
@@ -146,8 +146,8 @@ type EnumValue struct {
 
 // Relationship represents a navigation property.
 type Relationship struct {
-	Name       string `json:"name"`
-	Target     string `json:"target"`
+	Name         string `json:"name"`
+	Target       string `json:"target"`
 	Multiplicity string `json:"multiplicity"`
 }
 
@@ -202,13 +202,13 @@ type GuardrailResult struct {
 
 // SchemaCommand represents a single command in the exported CLI schema.
 type SchemaCommand struct {
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Args        []SchemaArg       `json:"args,omitempty"`
-	Flags       []SchemaFlag      `json:"flags,omitempty"`
-	Examples    []SchemaExample   `json:"examples,omitempty"`
-	Guardrails  []string          `json:"guardrails,omitempty"`
-	SubCommands []SchemaCommand   `json:"sub_commands,omitempty"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Args        []SchemaArg     `json:"args,omitempty"`
+	Flags       []SchemaFlag    `json:"flags,omitempty"`
+	Examples    []SchemaExample `json:"examples,omitempty"`
+	Guardrails  []string        `json:"guardrails,omitempty"`
+	SubCommands []SchemaCommand `json:"sub_commands,omitempty"`
 }
 
 // SchemaArg represents a positional argument in the schema.
