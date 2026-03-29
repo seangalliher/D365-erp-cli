@@ -58,7 +58,7 @@ $select, $filter, $top etc. from being treated as PowerShell variables.`,
 
 // Execute runs the root command.
 func Execute() error {
-	client.Version = version
+	client.SetVersion(version)
 	return rootCmd.Execute()
 }
 
