@@ -3,7 +3,13 @@ version: "2"
 run:
   timeout: 3m
 
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
 linters:
+  default: none
   enable:
     - govet
     - errcheck
@@ -12,42 +18,40 @@ linters:
     - gosimple
     - ineffassign
     - gocritic
-    - gofmt
-    - goimports
     - misspell
     - bodyclose
     - noctx
 
-linters-settings:
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-    disabled-checks:
-      - ifElseChain
-      - commentedOutCode
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+      disabled-checks:
+        - ifElseChain
+        - commentedOutCode
 
-  errcheck:
-    exclude-functions:
-      - (io.Closer).Close
-      - (*os.File).Close
-      - (net.Conn).Close
+    errcheck:
+      exclude-functions:
+        - (io.Closer).Close
+        - (*os.File).Close
+        - (net.Conn).Close
 
-  misspell:
-    locale: US
+    misspell:
+      locale: US
 
-issues:
-  exclude-rules:
-    # Test files: allow dot imports, unused params, etc.
-    - path: _test\.go
-      linters:
-        - errcheck
-        - gocritic
+  exclusions:
+    rules:
+      # Test files: allow dot imports, unused params, etc.
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gocritic
 
-    # Allow fmt.Fprint* to stderr without checking errors
-    - linters:
-        - errcheck
-      text: "fmt\\.Fprint"
+      # Allow fmt.Fprint* to stderr without checking errors
+      - linters:
+          - errcheck
+        text: "fmt\\.Fprint"
 
-  max-issues-per-linter: 50
-  max-same-issues: 5
+    max-issues-per-linter: 50
+    max-same-issues: 5
