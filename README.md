@@ -226,6 +226,54 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
 
 ## Architecture
 
+```mermaid
+graph TB
+    User([User / AI Agent]) --> CLI
+
+    subgraph CLI["d365 CLI"]
+        direction TB
+        Cobra[Cobra Commands<br/><i>cmd/</i>]
+        Guardrails[Guardrails<br/><i>AI safety rules</i>]
+        Output[Output Renderer<br/><i>JSON · table · CSV · raw</i>]
+        Cobra --> Guardrails --> Output
+    end
+
+    subgraph Core["Core Services"]
+        direction TB
+        Auth[Auth<br/><i>5 Azure AD flows</i>]
+        Client[OData Client<br/><i>HTTP + retry</i>]
+        Config[Config<br/><i>profiles · sessions</i>]
+        Batch[Batch<br/><i>JSONL pipeline</i>]
+        Errors[Errors<br/><i>structured + suggestions</i>]
+    end
+
+    subgraph Daemon["Form Daemon"]
+        direction TB
+        Server[IPC Server<br/><i>TCP :51365</i>]
+        DClient[Daemon Client]
+        Server --- DClient
+    end
+
+    CLI --> Core
+    CLI --> Daemon
+
+    Client --> D365[(D365 F&O<br/>OData / API)]
+    Auth --> Entra[Microsoft Entra ID]
+    Server --> D365
+
+    classDef primary fill:#2563eb,stroke:#1d4ed8,color:#fff
+    classDef service fill:#7c3aed,stroke:#6d28d9,color:#fff
+    classDef external fill:#059669,stroke:#047857,color:#fff
+    classDef user fill:#d97706,stroke:#b45309,color:#fff
+
+    class CLI primary
+    class Core,Daemon service
+    class D365,Entra external
+    class User user
+```
+
+### Package Layout
+
 ```
 d365 (single binary)
 ├── cmd/           Cobra command definitions
