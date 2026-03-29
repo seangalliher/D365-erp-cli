@@ -6,8 +6,6 @@ import (
 )
 
 func TestPromptForArgFrom_ValidInput(t *testing.T) {
-	t.Parallel()
-
 	r := strings.NewReader("https://contoso.operations.dynamics.com\n")
 	w := new(strings.Builder)
 
@@ -26,8 +24,6 @@ func TestPromptForArgFrom_ValidInput(t *testing.T) {
 }
 
 func TestPromptForArgFrom_EmptyInput(t *testing.T) {
-	t.Parallel()
-
 	r := strings.NewReader("\n")
 	w := new(strings.Builder)
 
@@ -41,8 +37,6 @@ func TestPromptForArgFrom_EmptyInput(t *testing.T) {
 }
 
 func TestPromptForArgFrom_TrimsWhitespace(t *testing.T) {
-	t.Parallel()
-
 	r := strings.NewReader("  USMF  \n")
 	w := new(strings.Builder)
 
@@ -56,8 +50,6 @@ func TestPromptForArgFrom_TrimsWhitespace(t *testing.T) {
 }
 
 func TestPromptForArgFrom_ShowsHint(t *testing.T) {
-	t.Parallel()
-
 	r := strings.NewReader("test\n")
 	w := new(strings.Builder)
 

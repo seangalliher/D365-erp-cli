@@ -6,8 +6,6 @@ import (
 )
 
 func TestAgentPromptCmd_Structure(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAgentPromptCmd()
 	if cmd.Use != "agent-prompt" {
 		t.Errorf("unexpected Use: %s", cmd.Use)
@@ -15,8 +13,6 @@ func TestAgentPromptCmd_Structure(t *testing.T) {
 }
 
 func TestBuildAgentPrompt_ContainsKeySections(t *testing.T) {
-	t.Parallel()
-
 	prompt := buildAgentPrompt()
 
 	sections := []string{
@@ -38,8 +34,6 @@ func TestBuildAgentPrompt_ContainsKeySections(t *testing.T) {
 }
 
 func TestBuildAgentPrompt_ContainsErrorCodes(t *testing.T) {
-	t.Parallel()
-
 	prompt := buildAgentPrompt()
 
 	codes := []string{
@@ -58,8 +52,6 @@ func TestBuildAgentPrompt_ContainsErrorCodes(t *testing.T) {
 }
 
 func TestBuildAgentPrompt_ContainsCommands(t *testing.T) {
-	t.Parallel()
-
 	prompt := buildAgentPrompt()
 
 	commands := []string{
@@ -77,8 +69,6 @@ func TestBuildAgentPrompt_ContainsCommands(t *testing.T) {
 }
 
 func TestBuildAgentPrompt_ContainsGuardrails(t *testing.T) {
-	t.Parallel()
-
 	prompt := buildAgentPrompt()
 
 	if !strings.Contains(prompt, "cross-company") {

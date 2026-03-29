@@ -11,8 +11,6 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestAPICmd_HasFindAndInvokeSubcommands(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPICmd()
 	subcommands := cmd.Commands()
 
@@ -43,8 +41,6 @@ func TestAPICmd_HasFindAndInvokeSubcommands(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestAPIFindCmd_RequiresSearchTermArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPICmd()
 	cmd.SetArgs([]string{"find"})
 	err := cmd.Execute()
@@ -61,8 +57,6 @@ func TestAPIFindCmd_RequiresSearchTermArg(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestAPIInvokeCmd_RequiresActionNameArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPICmd()
 	cmd.SetArgs([]string{"invoke", "--params", `{"key": "value"}`})
 	err := cmd.Execute()
@@ -75,8 +69,6 @@ func TestAPIInvokeCmd_RequiresActionNameArg(t *testing.T) {
 }
 
 func TestAPIInvokeCmd_RequiresParamsFlag(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPICmd()
 	cmd.SetArgs([]string{"invoke", "SomeAction"})
 	err := cmd.Execute()
@@ -90,8 +82,6 @@ func TestAPIInvokeCmd_RequiresParamsFlag(t *testing.T) {
 }
 
 func TestAPIInvokeCmd_InvalidParamsJSON(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPICmd()
 	cmd.SetArgs([]string{"invoke", "SomeAction", "--params", "not valid json"})
 	err := cmd.Execute()
@@ -104,8 +94,6 @@ func TestAPIInvokeCmd_InvalidParamsJSON(t *testing.T) {
 }
 
 func TestAPIInvokeCmd_CompanyFlagExists(t *testing.T) {
-	t.Parallel()
-
 	cmd := newAPIInvokeCmd()
 	f := cmd.Flags().Lookup("company")
 	if f == nil {
@@ -121,8 +109,6 @@ func TestAPIInvokeCmd_CompanyFlagExists(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestSchemaCmd_ProducesValidJSON(t *testing.T) {
-	t.Parallel()
-
 	// Build schema from the root command which has all registered subcommands.
 	schema := buildSchema(rootCmd, false)
 
@@ -169,8 +155,6 @@ func TestSchemaCmd_ProducesValidJSON(t *testing.T) {
 }
 
 func TestSchemaCmd_FullIncludesGuardrails(t *testing.T) {
-	t.Parallel()
-
 	schema := buildSchema(rootCmd, true)
 
 	// Marshal and check it's valid.
@@ -195,8 +179,6 @@ func TestSchemaCmd_FullIncludesGuardrails(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestDocsCmd_ListsTopicsWhenNoArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDocsCmd()
 	cmd.SetArgs([]string{})
 
@@ -209,8 +191,6 @@ func TestDocsCmd_ListsTopicsWhenNoArg(t *testing.T) {
 }
 
 func TestDocsCmd_ReturnsContentForValidTopic(t *testing.T) {
-	t.Parallel()
-
 	// Verify all expected topics exist and have content.
 	expectedTopics := []string{
 		"odata-filters",
@@ -236,8 +216,6 @@ func TestDocsCmd_ReturnsContentForValidTopic(t *testing.T) {
 }
 
 func TestDocsCmd_UnknownTopicSuggestsMatches(t *testing.T) {
-	t.Parallel()
-
 	suggestions := findClosestTopics("odata")
 	found := false
 	for _, s := range suggestions {
@@ -252,8 +230,6 @@ func TestDocsCmd_UnknownTopicSuggestsMatches(t *testing.T) {
 }
 
 func TestDocsCmd_UnknownTopicNoMatch(t *testing.T) {
-	t.Parallel()
-
 	suggestions := findClosestTopics("zzzznonexistent")
 	if len(suggestions) != 0 {
 		t.Errorf("expected no suggestions for gibberish query, got: %v", suggestions)

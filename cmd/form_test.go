@@ -8,8 +8,6 @@ import (
 )
 
 func TestParseControlValues(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name    string
 		args    []string
@@ -26,7 +24,6 @@ func TestParseControlValues(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			result, err := parseControlValues(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
@@ -40,8 +37,6 @@ func TestParseControlValues(t *testing.T) {
 }
 
 func TestParseControlValues_Content(t *testing.T) {
-	t.Parallel()
-
 	result, err := parseControlValues([]string{"Name=John", "AccountNum=US-001"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -62,8 +57,6 @@ func TestParseControlValues_Content(t *testing.T) {
 }
 
 func TestFindEquals(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		input string
 		want  int
@@ -77,7 +70,6 @@ func TestFindEquals(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			t.Parallel()
 			got := findEquals(tt.input)
 			if got != tt.want {
 				t.Errorf("findEquals(%q) = %d, want %d", tt.input, got, tt.want)
@@ -87,8 +79,6 @@ func TestFindEquals(t *testing.T) {
 }
 
 func TestResolveCompany(t *testing.T) {
-	t.Parallel()
-
 	// Override takes precedence
 	result := resolveCompany("USMF")
 	if result != "USMF" {
@@ -109,8 +99,6 @@ func formDaemonError(code, msg string) *types.ErrorInfo {
 }
 
 func TestFormDaemonError(t *testing.T) {
-	t.Parallel()
-
 	errInfo := formDaemonError("TEST_ERR", "something failed")
 	if errInfo.Code != "TEST_ERR" {
 		t.Errorf("expected code 'TEST_ERR', got %q", errInfo.Code)
@@ -121,8 +109,6 @@ func TestFormDaemonError(t *testing.T) {
 }
 
 func TestDaemonProtocolConstants(t *testing.T) {
-	t.Parallel()
-
 	// Verify form commands map to expected daemon protocol commands
 	expected := map[string]string{
 		"find":          daemon.CmdFormFindMenu,

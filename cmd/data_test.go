@@ -10,8 +10,6 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestDataCmd_HasAllSubcommands(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	subcommands := cmd.Commands()
 
@@ -46,8 +44,6 @@ func TestDataCmd_HasAllSubcommands(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestFindTypeCmd_RequiresArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"find-type"})
 	err := cmd.Execute()
@@ -60,8 +56,6 @@ func TestFindTypeCmd_RequiresArg(t *testing.T) {
 }
 
 func TestFindTypeCmd_TopFlagDefault(t *testing.T) {
-	t.Parallel()
-
 	cmd := newFindTypeCmd()
 	topFlag := cmd.Flags().Lookup("top")
 	if topFlag == nil {
@@ -77,8 +71,6 @@ func TestFindTypeCmd_TopFlagDefault(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestMetadataCmd_RequiresArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"metadata"})
 	err := cmd.Execute()
@@ -91,8 +83,6 @@ func TestMetadataCmd_RequiresArg(t *testing.T) {
 }
 
 func TestMetadataCmd_BooleanFlags(t *testing.T) {
-	t.Parallel()
-
 	cmd := newMetadataCmd()
 	for _, flagName := range []string{"enums", "keys", "constraints", "relationships"} {
 		f := cmd.Flags().Lookup(flagName)
@@ -110,8 +100,6 @@ func TestMetadataCmd_BooleanFlags(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestFindCmd_RequiresArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"find"})
 	err := cmd.Execute()
@@ -124,8 +112,6 @@ func TestFindCmd_RequiresArg(t *testing.T) {
 }
 
 func TestFindCmd_QueryFlag(t *testing.T) {
-	t.Parallel()
-
 	cmd := newFindCmd()
 	f := cmd.Flags().Lookup("query")
 	if f == nil {
@@ -141,8 +127,6 @@ func TestFindCmd_QueryFlag(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestCreateCmd_RequiresArg(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"create", "--data", `{"Name":"Test"}`})
 	err := cmd.Execute()
@@ -155,8 +139,6 @@ func TestCreateCmd_RequiresArg(t *testing.T) {
 }
 
 func TestCreateCmd_RequiresDataFlag(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"create", "Customers"})
 	err := cmd.Execute()
@@ -170,8 +152,6 @@ func TestCreateCmd_RequiresDataFlag(t *testing.T) {
 }
 
 func TestCreateCmd_InvalidJSON(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"create", "Customers", "--data", "not valid json"})
 	err := cmd.Execute()
@@ -188,8 +168,6 @@ func TestCreateCmd_InvalidJSON(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestUpdateCmd_RequiresDataFlag(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"update"})
 	err := cmd.Execute()
@@ -203,8 +181,6 @@ func TestUpdateCmd_RequiresDataFlag(t *testing.T) {
 }
 
 func TestUpdateCmd_InvalidJSON(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"update", "--data", "not valid json"})
 	err := cmd.Execute()
@@ -217,8 +193,6 @@ func TestUpdateCmd_InvalidJSON(t *testing.T) {
 }
 
 func TestUpdateCmd_EmptyArray(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"update", "--data", "[]"})
 	err := cmd.Execute()
@@ -235,8 +209,6 @@ func TestUpdateCmd_EmptyArray(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestDeleteCmd_RequiresPathsFlag(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"delete", "--confirm"})
 	err := cmd.Execute()
@@ -250,8 +222,6 @@ func TestDeleteCmd_RequiresPathsFlag(t *testing.T) {
 }
 
 func TestDeleteCmd_RequiresConfirm(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"delete", "--paths", `["Customers(dataAreaId='USMF',CustomerAccount='US-001')"]`})
 	err := cmd.Execute()
@@ -264,8 +234,6 @@ func TestDeleteCmd_RequiresConfirm(t *testing.T) {
 }
 
 func TestDeleteCmd_InvalidPathsJSON(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"delete", "--paths", "not valid json", "--confirm"})
 	err := cmd.Execute()
@@ -278,8 +246,6 @@ func TestDeleteCmd_InvalidPathsJSON(t *testing.T) {
 }
 
 func TestDeleteCmd_EmptyPaths(t *testing.T) {
-	t.Parallel()
-
 	cmd := newDataCmd()
 	cmd.SetArgs([]string{"delete", "--paths", "[]", "--confirm"})
 	err := cmd.Execute()
@@ -296,8 +262,6 @@ func TestDeleteCmd_EmptyPaths(t *testing.T) {
 // ---------------------------------------------------------------------------
 
 func TestParseRawQueryOptions_Empty(t *testing.T) {
-	t.Parallel()
-
 	opts, err := parseRawQueryOptions("")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -318,8 +282,6 @@ func TestParseRawQueryOptions_Empty(t *testing.T) {
 }
 
 func TestParseRawQueryOptions_AllFields(t *testing.T) {
-	t.Parallel()
-
 	raw := "$filter=Name eq 'Contoso'&$select=CustomerAccount,Name&$expand=Orders&$orderby=Name asc&$top=10&$skip=5&$count=true&cross-company=true"
 	opts, err := parseRawQueryOptions(raw)
 	if err != nil {
@@ -353,8 +315,6 @@ func TestParseRawQueryOptions_AllFields(t *testing.T) {
 }
 
 func TestParseRawQueryOptions_CrossCompanyFalse(t *testing.T) {
-	t.Parallel()
-
 	opts, err := parseRawQueryOptions("cross-company=false")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -368,8 +328,6 @@ func TestParseRawQueryOptions_CrossCompanyFalse(t *testing.T) {
 }
 
 func TestParseRawQueryOptions_SelectOnly(t *testing.T) {
-	t.Parallel()
-
 	opts, err := parseRawQueryOptions("$select=CustomerAccount,Name")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)

@@ -6,8 +6,6 @@ import (
 )
 
 func TestCompletionCmd_Structure(t *testing.T) {
-	t.Parallel()
-
 	cmd := newCompletionCmd()
 
 	if cmd.Use != "completion <shell>" {
@@ -19,8 +17,6 @@ func TestCompletionCmd_Structure(t *testing.T) {
 }
 
 func TestCompletionCmd_PowerShell(t *testing.T) {
-	t.Parallel()
-
 	cmd := newCompletionCmd()
 	buf := new(strings.Builder)
 	cmd.SetOut(buf)
@@ -35,8 +31,6 @@ func TestCompletionCmd_PowerShell(t *testing.T) {
 }
 
 func TestCompletionCmd_InvalidShell(t *testing.T) {
-	t.Parallel()
-
 	cmd := newCompletionCmd()
 	err := cmd.RunE(cmd, []string{"nushell"})
 	if err == nil {
