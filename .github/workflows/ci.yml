@@ -35,7 +35,13 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: Run unit tests with race detection
-        run: go test -v -race -count=1 -parallel 8 -coverprofile=coverage.out ./...
+        shell: bash
+        run: |
+          COVER_FLAG=""
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            COVER_FLAG="-coverprofile=coverage.out"
+          fi
+          go test -v -race -count=1 -parallel 8 $COVER_FLAG ./...
       - name: Check coverage
         if: matrix.os == 'ubuntu-latest'
         run: |
