@@ -1,0 +1,45 @@
+# Binaries
+d365
+d365.exe
+d365-formd
+d365-formd.exe
+/dist/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (don't commit user config)
+.d365cli/
+
+# Coverage
+coverage.out
+coverage.html
+
+# Build
+/bin/
+
+# Temp
+/tmp/
+
+# Internal docs (not for publishing)
+Prompts/
+Vibes/
