@@ -25,7 +25,6 @@ func failingTokenProvider(_ context.Context) (string, error) {
 }
 
 func TestClient_RetryOn429ThenSuccess(t *testing.T) {
-	t.Parallel()
 
 	var attempts int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +66,6 @@ func TestClient_RetryOn429ThenSuccess(t *testing.T) {
 }
 
 func TestClient_RetryExhausted(t *testing.T) {
-	t.Parallel()
 
 	var attempts int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +96,6 @@ func TestClient_RetryExhausted(t *testing.T) {
 }
 
 func TestClient_AuthHeaderInjected(t *testing.T) {
-	t.Parallel()
 
 	var capturedAuth string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +119,6 @@ func TestClient_AuthHeaderInjected(t *testing.T) {
 }
 
 func TestClient_UserAgentHeader(t *testing.T) {
-	t.Parallel()
 
 	var capturedUA string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -145,7 +141,6 @@ func TestClient_UserAgentHeader(t *testing.T) {
 }
 
 func TestClient_AcceptHeaderDefault(t *testing.T) {
-	t.Parallel()
 
 	var capturedAccept string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +163,6 @@ func TestClient_AcceptHeaderDefault(t *testing.T) {
 }
 
 func TestClient_TokenProviderError(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Error("server should not have been called")
@@ -187,7 +181,6 @@ func TestClient_TokenProviderError(t *testing.T) {
 }
 
 func TestClient_Timeout(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Simulate a slow server.
@@ -212,7 +205,6 @@ func TestClient_Timeout(t *testing.T) {
 }
 
 func TestClient_ErrorWrapping_401(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -234,7 +226,6 @@ func TestClient_ErrorWrapping_401(t *testing.T) {
 }
 
 func TestClient_ErrorWrapping_404(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
@@ -256,7 +247,6 @@ func TestClient_ErrorWrapping_404(t *testing.T) {
 }
 
 func TestClient_PostBodySent(t *testing.T) {
-	t.Parallel()
 
 	var capturedBody string
 	var capturedContentType string
@@ -286,7 +276,6 @@ func TestClient_PostBodySent(t *testing.T) {
 }
 
 func TestClient_ContextCancellation(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(5 * time.Second)
@@ -309,7 +298,6 @@ func TestClient_ContextCancellation(t *testing.T) {
 }
 
 func TestClient_DeleteMethod(t *testing.T) {
-	t.Parallel()
 
 	var capturedMethod string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -331,7 +319,6 @@ func TestClient_DeleteMethod(t *testing.T) {
 }
 
 func TestClient_ErrorWrapping_403_PermissionDenied(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
@@ -353,7 +340,6 @@ func TestClient_ErrorWrapping_403_PermissionDenied(t *testing.T) {
 }
 
 func TestClient_ErrorWrapping_400_BadRequest(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -375,7 +361,6 @@ func TestClient_ErrorWrapping_400_BadRequest(t *testing.T) {
 }
 
 func TestClient_ErrorSuggestions(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
 		name       string
@@ -392,8 +377,6 @@ func TestClient_ErrorSuggestions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(tt.statusCode)
 				fmt.Fprint(w, `{"error":"test"}`)
@@ -425,7 +408,6 @@ func TestClient_ErrorSuggestions(t *testing.T) {
 }
 
 func TestClient_PatchMethod(t *testing.T) {
-	t.Parallel()
 
 	var capturedMethod string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

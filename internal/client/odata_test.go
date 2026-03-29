@@ -13,7 +13,6 @@ import (
 )
 
 func TestBuildQueryString_Empty(t *testing.T) {
-	t.Parallel()
 
 	qs := BuildQueryString(QueryOptions{})
 	// Should auto-inject cross-company=true when CrossCompany is nil.
@@ -23,7 +22,6 @@ func TestBuildQueryString_Empty(t *testing.T) {
 }
 
 func TestBuildQueryString_AllFields(t *testing.T) {
-	t.Parallel()
 
 	crossCompanyTrue := true
 	qs := BuildQueryString(QueryOptions{
@@ -55,7 +53,6 @@ func TestBuildQueryString_AllFields(t *testing.T) {
 }
 
 func TestBuildQueryString_CrossCompanyAutoInject(t *testing.T) {
-	t.Parallel()
 
 	// nil CrossCompany should auto-inject cross-company=true.
 	qs := BuildQueryString(QueryOptions{Filter: "Status eq 'Active'"})
@@ -65,7 +62,6 @@ func TestBuildQueryString_CrossCompanyAutoInject(t *testing.T) {
 }
 
 func TestBuildQueryString_CrossCompanyExplicitFalse(t *testing.T) {
-	t.Parallel()
 
 	crossCompanyFalse := false
 	qs := BuildQueryString(QueryOptions{
@@ -78,7 +74,6 @@ func TestBuildQueryString_CrossCompanyExplicitFalse(t *testing.T) {
 }
 
 func TestBuildQueryString_TopOnly(t *testing.T) {
-	t.Parallel()
 
 	qs := BuildQueryString(QueryOptions{Top: 5})
 	if !strings.Contains(qs, "%24top=5") {
@@ -87,7 +82,6 @@ func TestBuildQueryString_TopOnly(t *testing.T) {
 }
 
 func TestODataResponseParsing(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp := map[string]interface{}{
@@ -122,7 +116,6 @@ func TestODataResponseParsing(t *testing.T) {
 }
 
 func TestODataResponseParsing_EmptyValue(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp := map[string]interface{}{
@@ -147,7 +140,6 @@ func TestODataResponseParsing_EmptyValue(t *testing.T) {
 }
 
 func TestODataErrorParsing(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -186,7 +178,6 @@ func TestODataErrorParsing(t *testing.T) {
 }
 
 func TestODataClient_CreateEntity(t *testing.T) {
-	t.Parallel()
 
 	var capturedMethod string
 	var capturedBody map[string]interface{}
@@ -225,7 +216,6 @@ func TestODataClient_CreateEntity(t *testing.T) {
 }
 
 func TestODataClient_UpdateEntity(t *testing.T) {
-	t.Parallel()
 
 	var capturedMethod string
 	var capturedPath string
@@ -261,7 +251,6 @@ func TestODataClient_UpdateEntity(t *testing.T) {
 }
 
 func TestODataClient_DeleteEntity(t *testing.T) {
-	t.Parallel()
 
 	var capturedMethod string
 	var capturedPath string
@@ -290,7 +279,6 @@ func TestODataClient_DeleteEntity(t *testing.T) {
 }
 
 func TestODataClient_GetMetadata(t *testing.T) {
-	t.Parallel()
 
 	metadataXML := `<?xml version="1.0" encoding="utf-8"?>
 <edmx:Edmx Version="4.0">
@@ -328,7 +316,6 @@ func TestODataClient_GetMetadata(t *testing.T) {
 }
 
 func TestODataClient_FindEntityTypes(t *testing.T) {
-	t.Parallel()
 
 	metadataXML := `<?xml version="1.0" encoding="utf-8"?>
 <edmx:Edmx Version="4.0">
@@ -389,7 +376,6 @@ func TestODataClient_FindEntityTypes(t *testing.T) {
 }
 
 func TestODataClient_FindEntityTypes_TopLimit(t *testing.T) {
-	t.Parallel()
 
 	metadataXML := `<?xml version="1.0" encoding="utf-8"?>
 <edmx:Edmx Version="4.0">
@@ -426,7 +412,6 @@ func TestODataClient_FindEntityTypes_TopLimit(t *testing.T) {
 }
 
 func TestODataClient_QueryEntities_PathForwarding(t *testing.T) {
-	t.Parallel()
 
 	var capturedPath string
 	var capturedQuery string
@@ -458,7 +443,6 @@ func TestODataClient_QueryEntities_PathForwarding(t *testing.T) {
 }
 
 func TestODataErrorResponse_StructuredParsing(t *testing.T) {
-	t.Parallel()
 
 	body := `{
 		"error": {
@@ -500,7 +484,6 @@ func TestODataErrorResponse_StructuredParsing(t *testing.T) {
 }
 
 func TestParseODataError_FromResponse(t *testing.T) {
-	t.Parallel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -538,7 +521,6 @@ func TestParseODataError_FromResponse(t *testing.T) {
 }
 
 func TestExtractXMLAttr(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
 		name     string
@@ -568,7 +550,6 @@ func TestExtractXMLAttr(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			got := extractXMLAttr(tt.input, tt.attr)
 			if got != tt.expected {
 				t.Errorf("extractXMLAttr(%q, %q) = %q, want %q", tt.input, tt.attr, got, tt.expected)
