@@ -46,6 +46,11 @@ d365 status
 d365 doctor
 ```
 
+> **PowerShell users:** OData parameters like `$top`, `$select`, and `$filter` start with `$`, which PowerShell treats as variables. Always wrap `--query` values in **single quotes** to prevent expansion:
+> ```powershell
+> d365 data find Customers --query '$top=5&$select=CustomerAccount,Name'
+> ```
+
 ## Command Reference
 
 ### Connection
@@ -62,7 +67,7 @@ d365 company set USMF        # Switch company
 ```bash
 d365 data find-type <search>          # Find entity types
 d365 data metadata <entity>           # Get entity schema
-d365 data find <entity> --query "..." # Query entities
+d365 data find <entity> --query '...' # Query entities (use single quotes!)
 d365 data create <entity> --data '{...}'
 d365 data update --data '[{"ODataPath":"...","UpdatedFieldValues":{...}}]'
 d365 data delete --paths '["Customers(...)"]' --confirm
@@ -192,8 +197,7 @@ $ d365 data create MainAccounts --data '{
 ✓ Created MainAccounts('600100')
 
 # Step 10 — Verify the setup
-$ d365 data find MainAccounts \
-    --query '$filter=ChartOfAccounts eq "ACME-COA"&$select=MainAccountId,Name,MainAccountType'
+$ d365 data find MainAccounts --query '$filter=ChartOfAccounts eq ''ACME-COA''&$select=MainAccountId,Name,MainAccountType'
 ┌────────────────┬────────────────────┬──────────────┐
 │ MainAccountId  │ Name               │ Type         │
 ├────────────────┼────────────────────┼──────────────┤
@@ -207,7 +211,8 @@ Every step returns structured JSON, so the agent can inspect results, handle err
 
 > **Want to try it yourself?** The full example with ready-to-use JSON files, a JSONL batch script, and a Copilot prompt is in [`examples/legal-entity-setup/`](examples/legal-entity-setup/). Run the entire setup in one command:
 > ```bash
-> cat examples/legal-entity-setup/batch.jsonl | d365 batch
+> cat examples/legal-entity-setup/batch.jsonl | d365 batch            # bash/zsh
+> Get-Content examples/legal-entity-setup/batch.jsonl | d365 batch    # PowerShell
 > ```
 
 ### System Prompt Generation
@@ -242,7 +247,8 @@ Every command returns this structure:
 Export the full CLI schema for AI tool registration:
 
 ```bash
-d365 schema --full | jq .
+d365 schema --full | jq .                                       # bash + jq
+d365 schema --full | ConvertFrom-Json | ConvertTo-Json -Depth 10 # PowerShell
 ```
 
 ### Batch/Pipeline Mode
@@ -252,6 +258,14 @@ Send multiple commands via JSONL on stdin:
 ```bash
 echo '{"command":"data find","args":{"entity":"Customers","query":"$top=3"}}
 {"command":"data find","args":{"entity":"Vendors","query":"$top=3"}}' | d365 batch
+```
+
+PowerShell equivalent:
+```powershell
+@'
+{"command":"data find","args":{"entity":"Customers","query":"$top=3"}}
+{"command":"data find","args":{"entity":"Vendors","query":"$top=3"}}
+'@ | d365 batch
 ```
 
 ### Guardrails
@@ -276,7 +290,8 @@ Built-in safety checks for AI agents:
 
 ```bash
 # Config file location
-~/.d365cli/config.json
+~/.d365cli/config.json          # Linux/macOS
+$env:USERPROFILE\.d365cli\config.json   # Windows/PowerShell
 
 # Environment variables
 D365_URL            # Default environment URL
