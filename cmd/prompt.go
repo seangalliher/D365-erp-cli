@@ -21,7 +21,7 @@ func promptForArg(name, hint string) (string, error) {
 
 // promptForArgFrom is the testable version of promptForArg.
 func promptForArgFrom(r io.Reader, w io.Writer, name, hint string) (string, error) {
-	prompt := fmt.Sprintf("%s", name)
+	prompt := name
 	if hint != "" {
 		prompt += fmt.Sprintf(" (%s)", hint)
 	}

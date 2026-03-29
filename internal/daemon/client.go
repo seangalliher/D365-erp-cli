@@ -246,7 +246,7 @@ func StopDaemon() error {
 	if err != nil {
 		return nil // Already stopped
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	_, _ = client.SendCommand(CmdShutdown, nil)
 
@@ -264,7 +264,7 @@ func IsRunning() bool {
 	if err != nil {
 		return false
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	_, err = client.Ping()
 	return err == nil
 }

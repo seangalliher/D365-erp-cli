@@ -155,7 +155,7 @@ func writeCommandTree(sb *strings.Builder, cmd *cobra.Command, depth int) {
 		}
 
 		indent := strings.Repeat("  ", depth)
-		sb.WriteString(fmt.Sprintf("%s- **%s**", indent, sub.CommandPath()))
+		fmt.Fprintf(sb, "%s- **%s**", indent, sub.CommandPath())
 
 		// Add args
 		args := extractArgs(sub)
@@ -181,7 +181,7 @@ func writeCommandTree(sb *strings.Builder, cmd *cobra.Command, depth int) {
 				if f.Required {
 					required = " *(required)*"
 				}
-				sb.WriteString(fmt.Sprintf("%s  - `--%s` (%s): %s%s\n", indent, f.Name, f.Type, f.Description, required))
+				fmt.Fprintf(sb, "%s  - `--%s` (%s): %s%s\n", indent, f.Name, f.Type, f.Description, required)
 			}
 		}
 

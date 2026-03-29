@@ -194,14 +194,9 @@ func (a *Authenticator) Method() string {
 // BrowserProvider implements Provider using
 // azidentity.InteractiveBrowserCredential.
 type BrowserProvider struct {
-	// credential is the underlying azidentity.InteractiveBrowserCredential.
-	// Typed as interface{} so this package compiles without importing
-	// azidentity; the real credential is injected via the factory.
 	credential interface {
 		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
 	}
-	tenantID string
-	clientID string
 }
 
 func (p *BrowserProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -215,8 +210,6 @@ type DeviceCodeProvider struct {
 	credential interface {
 		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
 	}
-	tenantID string
-	clientID string
 }
 
 func (p *DeviceCodeProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
@@ -230,8 +223,6 @@ type ClientCredentialProvider struct {
 	credential interface {
 		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
 	}
-	tenantID string
-	clientID string
 }
 
 func (p *ClientCredentialProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {

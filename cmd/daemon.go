@@ -105,7 +105,7 @@ func newDaemonStatusCmd() *cobra.Command {
 				}, start)
 				return nil
 			}
-			defer client.Close()
+			defer func() { _ = client.Close() }()
 
 			ping, err := client.Ping()
 			if err != nil {

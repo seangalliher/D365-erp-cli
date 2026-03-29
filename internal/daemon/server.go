@@ -27,8 +27,7 @@ type Server struct {
 	logger   *log.Logger
 
 	// Session state
-	sessionID string
-	formOpen  bool
+	formOpen bool
 	formName  string
 }
 
