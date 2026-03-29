@@ -28,7 +28,7 @@ type Server struct {
 
 	// Session state
 	formOpen bool
-	formName  string
+	formName string
 }
 
 // Handler processes daemon commands. Implementations bridge to the

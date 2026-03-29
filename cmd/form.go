@@ -63,7 +63,7 @@ func sendFormCommand(command string, args interface{}) (json.RawMessage, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	resp, err := client.SendCommand(command, args)
 	if err != nil {

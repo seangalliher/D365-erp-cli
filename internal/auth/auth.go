@@ -248,7 +248,6 @@ type ManagedIdentityProvider struct {
 	credential interface {
 		GetTokenFunc(ctx context.Context, scopes []string) (*TokenResult, error)
 	}
-	clientID string // optional user-assigned identity
 }
 
 func (p *ManagedIdentityProvider) GetToken(ctx context.Context, scopes []string) (*TokenResult, error) {
