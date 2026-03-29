@@ -15,8 +15,6 @@ linters:
     - errcheck
     - staticcheck
     - unused
-    - gosimple
-    - ineffassign
     - gocritic
     - misspell
     - bodyclose
