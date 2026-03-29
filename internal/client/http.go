@@ -12,13 +12,28 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 
 	clierrors "github.com/seangalliher/d365-erp-cli/internal/errors"
 )
 
-// Version is injected at build time; used in User-Agent.
-var Version = "dev"
+// version is the CLI version used in User-Agent, set once via SetVersion.
+var (
+	version     = "dev"
+	versionOnce sync.Once
+)
+
+// SetVersion sets the version string used in the User-Agent header.
+// It is safe to call from multiple goroutines; only the first call takes effect.
+func SetVersion(v string) {
+	versionOnce.Do(func() { version = v })
+}
+
+// GetVersion returns the current version string.
+func GetVersion() string {
+	return version
+}
 
 // retryConfig holds the retry policy for transient errors.
 var retryConfig = struct {
@@ -138,7 +153,7 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	// Standard headers.
-	req.Header.Set("User-Agent", "d365-cli/"+Version)
+	req.Header.Set("User-Agent", "d365-cli/"+GetVersion())
 	if req.Header.Get("Accept") == "" {
 		req.Header.Set("Accept", "application/json")
 	}
