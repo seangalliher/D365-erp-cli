@@ -1,0 +1,13 @@
+{"command":"data create","args":{"entity":"LegalEntities","data":"{\"LegalEntityId\":\"ACME\",\"Name\":\"ACME Corp\",\"CompanyType\":\"Organization\",\"AddressCountryRegion\":\"USA\"}"}}
+{"command":"company set","args":{"company":"ACME"}}
+{"command":"data create","args":{"entity":"LedgerChartOfAccounts","data":"{\"ChartOfAccounts\":\"ACME-COA\",\"Description\":\"ACME Corp Chart of Accounts\"}"}}
+{"command":"data create","args":{"entity":"Ledgers","data":"{\"ChartOfAccounts\":\"ACME-COA\",\"Name\":\"ACME General Ledger\",\"AccountingCurrency\":\"USD\",\"ReportingCurrency\":\"USD\",\"FiscalCalendar\":\"Standard\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"110100\",\"Name\":\"Cash - Operating\",\"MainAccountType\":\"BalanceSheet\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"120100\",\"Name\":\"Accounts Receivable\",\"MainAccountType\":\"BalanceSheet\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"200100\",\"Name\":\"Accounts Payable\",\"MainAccountType\":\"BalanceSheet\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"300100\",\"Name\":\"Retained Earnings\",\"MainAccountType\":\"BalanceSheet\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"400100\",\"Name\":\"Revenue\",\"MainAccountType\":\"Revenue\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"500100\",\"Name\":\"Cost of Goods Sold\",\"MainAccountType\":\"Expense\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"600100\",\"Name\":\"Operating Expenses\",\"MainAccountType\":\"Expense\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data create","args":{"entity":"MainAccounts","data":"{\"MainAccountId\":\"610100\",\"Name\":\"Payroll Expenses\",\"MainAccountType\":\"Expense\",\"ChartOfAccounts\":\"ACME-COA\"}"}}
+{"command":"data find","args":{"entity":"MainAccounts","query":"$filter=ChartOfAccounts eq 'ACME-COA'&$select=MainAccountId,Name,MainAccountType"}}

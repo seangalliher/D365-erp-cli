@@ -6,6 +6,9 @@
 
 **kubectl for D365** — a structured, scriptable CLI for Dynamics 365 Finance & Operations. Designed as the primary interface for AI agents, with full human usability.
 
+<!-- TODO: Replace with actual video URL when recorded -->
+[![Demo Video](https://img.shields.io/badge/Demo-Watch%20Video-red?style=for-the-badge&logo=youtube)](https://github.com/seangalliher/D365-erp-cli)
+
 ## Features
 
 - **25+ commands** covering Data (OData), API (actions), Form (stateful UI), and diagnostics
@@ -201,6 +204,11 @@ $ d365 data find MainAccounts \
 ```
 
 Every step returns structured JSON, so the agent can inspect results, handle errors, and chain operations — no screenshots, no clicking, no guesswork.
+
+> **Want to try it yourself?** The full example with ready-to-use JSON files, a JSONL batch script, and a Copilot prompt is in [`examples/legal-entity-setup/`](examples/legal-entity-setup/). Run the entire setup in one command:
+> ```bash
+> cat examples/legal-entity-setup/batch.jsonl | d365 batch
+> ```
 
 ### System Prompt Generation
 

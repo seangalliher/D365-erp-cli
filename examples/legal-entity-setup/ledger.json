@@ -1,0 +1,7 @@
+{
+  "ChartOfAccounts": "ACME-COA",
+  "Name": "ACME General Ledger",
+  "AccountingCurrency": "USD",
+  "ReportingCurrency": "USD",
+  "FiscalCalendar": "Standard"
+}
