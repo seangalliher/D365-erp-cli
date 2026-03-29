@@ -1,4 +1,4 @@
-# d365 — CLI for Dynamics 365 Finance & Operations
+# D365 — CLI for Dynamics 365 Finance & Operations
 
 [![CI](https://github.com/seangalliher/d365-erp-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/seangalliher/d365-erp-cli/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
