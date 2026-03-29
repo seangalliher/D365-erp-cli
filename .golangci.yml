@@ -53,5 +53,6 @@ linters:
           - errcheck
         text: "fmt\\.Fprint"
 
-    max-issues-per-linter: 50
-    max-same-issues: 5
+output:
+  max-issues-per-linter: 50
+  max-same-issues: 5
