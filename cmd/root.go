@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -24,6 +25,7 @@ var (
 
 // Global flags
 var (
+	flagMu      sync.RWMutex
 	flagOutput  string
 	flagCompany string
 	flagProfile string
@@ -81,6 +83,9 @@ func init() {
 }
 
 func initConfig() {
+	flagMu.Lock()
+	defer flagMu.Unlock()
+
 	// CI mode overrides
 	if flagCI || os.Getenv(config.EnvCI) == "true" {
 		flagOutput = "json"
@@ -103,13 +108,21 @@ func initConfig() {
 
 // GetRenderer creates a Renderer based on the current flag state.
 func GetRenderer() *output.Renderer {
-	return output.DefaultRenderer(flagOutput, flagQuiet)
+	flagMu.RLock()
+	o, q := flagOutput, flagQuiet
+	flagMu.RUnlock()
+	return output.DefaultRenderer(o, q)
 }
 
 // GetCompany returns the active company from flags, env, session, or config.
 func GetCompany() string {
-	if flagCompany != "" {
-		return flagCompany
+	flagMu.RLock()
+	company := flagCompany
+	profile := flagProfile
+	flagMu.RUnlock()
+
+	if company != "" {
+		return company
 	}
 	sess, err := config.LoadSession()
 	if err == nil && sess.Company != "" {
@@ -117,9 +130,9 @@ func GetCompany() string {
 	}
 	cfg, err := config.Load()
 	if err == nil {
-		profile := cfg.ActiveProfile(flagProfile)
-		if profile.Company != "" {
-			return profile.Company
+		p := cfg.ActiveProfile(profile)
+		if p.Company != "" {
+			return p.Company
 		}
 	}
 	return ""
@@ -130,14 +143,18 @@ func GetEnvironment() string {
 	if url := os.Getenv(config.EnvURL); url != "" {
 		return url
 	}
+	flagMu.RLock()
+	profile := flagProfile
+	flagMu.RUnlock()
+
 	sess, err := config.LoadSession()
 	if err == nil && sess.Environment != "" {
 		return sess.Environment
 	}
 	cfg, err := config.Load()
 	if err == nil {
-		profile := cfg.ActiveProfile(flagProfile)
-		return profile.Environment
+		p := cfg.ActiveProfile(profile)
+		return p.Environment
 	}
 	return ""
 }
@@ -205,7 +222,10 @@ func newVersionCmd() *cobra.Command {
 }
 
 func banner() string {
-	noColor := flagNoColor || os.Getenv("NO_COLOR") != ""
+	flagMu.RLock()
+	noColor := flagNoColor
+	flagMu.RUnlock()
+	noColor = noColor || os.Getenv("NO_COLOR") != ""
 
 	if noColor {
 		return `
