@@ -105,7 +105,102 @@ d365 version                 # Show version info
 
 ## AI Agent Integration
 
-d365 is designed as the primary CLI for AI agents interacting with D365 F&O.
+D365 is designed as the primary CLI for AI agents interacting with D365 F&O.
+
+### Example: Creating a Legal Entity with GitHub Copilot
+
+> **Prompt:** *"Create a new legal entity called ACME Corp with ID ACME, then set up its chart of accounts and general ledger."*
+
+Copilot uses the D365 CLI to execute each step automatically:
+
+```bash
+# Step 1 — Find the right entity type for legal entities
+$ d365 data find-type "legal entities"
+✓ Found: LegalEntities
+
+# Step 2 — Check the entity schema to know which fields to set
+$ d365 data metadata LegalEntities --query '$select=Name'
+✓ Fields: LegalEntityId, Name, CompanyType, AddressCountryRegion, ...
+
+# Step 3 — Create the legal entity
+$ d365 data create LegalEntities --data '{
+    "LegalEntityId": "ACME",
+    "Name": "ACME Corp",
+    "CompanyType": "Organization",
+    "AddressCountryRegion": "USA"
+  }'
+✓ Created LegalEntities(dataAreaId='ACME')
+
+# Step 4 — Switch context to the new company
+$ d365 company set ACME
+✓ Company set to ACME
+
+# Step 5 — Find the chart of accounts entity
+$ d365 data find-type "chart of accounts"
+✓ Found: LedgerChartOfAccounts
+
+# Step 6 — Create a chart of accounts
+$ d365 data create LedgerChartOfAccounts --data '{
+    "ChartOfAccounts": "ACME-COA",
+    "Description": "ACME Corp Chart of Accounts"
+  }'
+✓ Created LedgerChartOfAccounts('ACME-COA')
+
+# Step 7 — Find the ledger configuration entity
+$ d365 data find-type "ledger"
+✓ Found: Ledgers
+
+# Step 8 — Configure the general ledger for ACME
+$ d365 data create Ledgers --data '{
+    "ChartOfAccounts": "ACME-COA",
+    "Name": "ACME General Ledger",
+    "AccountingCurrency": "USD",
+    "ReportingCurrency": "USD",
+    "FiscalCalendar": "Standard"
+  }'
+✓ Created Ledgers for ACME
+
+# Step 9 — Create main accounts in the chart of accounts
+$ d365 data find-type "main accounts"
+✓ Found: MainAccounts
+
+$ d365 data create MainAccounts --data '{
+    "MainAccountId": "110100",
+    "Name": "Cash - Operating",
+    "MainAccountType": "BalanceSheet",
+    "ChartOfAccounts": "ACME-COA"
+  }'
+✓ Created MainAccounts('110100')
+
+$ d365 data create MainAccounts --data '{
+    "MainAccountId": "400100",
+    "Name": "Revenue",
+    "MainAccountType": "Revenue",
+    "ChartOfAccounts": "ACME-COA"
+  }'
+✓ Created MainAccounts('400100')
+
+$ d365 data create MainAccounts --data '{
+    "MainAccountId": "600100",
+    "Name": "Operating Expenses",
+    "MainAccountType": "Expense",
+    "ChartOfAccounts": "ACME-COA"
+  }'
+✓ Created MainAccounts('600100')
+
+# Step 10 — Verify the setup
+$ d365 data find MainAccounts \
+    --query '$filter=ChartOfAccounts eq "ACME-COA"&$select=MainAccountId,Name,MainAccountType'
+┌────────────────┬────────────────────┬──────────────┐
+│ MainAccountId  │ Name               │ Type         │
+├────────────────┼────────────────────┼──────────────┤
+│ 110100         │ Cash - Operating   │ BalanceSheet │
+│ 400100         │ Revenue            │ Revenue      │
+│ 600100         │ Operating Expenses │ Expense      │
+└────────────────┴────────────────────┴──────────────┘
+```
+
+Every step returns structured JSON, so the agent can inspect results, handle errors, and chain operations — no screenshots, no clicking, no guesswork.
 
 ### System Prompt Generation
 
