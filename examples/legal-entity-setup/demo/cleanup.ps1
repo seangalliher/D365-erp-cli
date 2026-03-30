@@ -33,10 +33,13 @@ foreach ($acct in $accounts) {
     & $d365 data delete --paths "[""MainAccounts(dataAreaId='ACME',MainAccountId='$acct',ChartOfAccounts='ACME-COA')""]" --confirm 2>$null
 }
 
-# Delete ledger
+# Delete ledger and chart of accounts (try both entity names and both COA IDs for safety)
 Write-Host "[3/4] Deleting ledger and chart of accounts..." -ForegroundColor Yellow
 & $d365 data delete --paths "[""Ledgers(LegalEntityId='ACME')""]" --confirm 2>$null
 & $d365 data delete --paths "[""ChartOfAccounts(ChartOfAccounts='ACME-COA')""]" --confirm 2>$null
+& $d365 data delete --paths "[""ChartOfAccounts(ChartOfAccounts='ACME')""]" --confirm 2>$null
+& $d365 data delete --paths "[""LedgerChartOfAccounts(ChartOfAccounts='ACME-COA')""]" --confirm 2>$null
+& $d365 data delete --paths "[""LedgerChartOfAccounts(ChartOfAccounts='ACME')""]" --confirm 2>$null
 
 # Switch back to default company and delete legal entity
 Write-Host "[4/4] Deleting ACME legal entity (this may take up to 60 seconds)..." -ForegroundColor Yellow

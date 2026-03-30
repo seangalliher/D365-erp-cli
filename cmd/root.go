@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -16,12 +17,35 @@ import (
 	"github.com/seangalliher/d365-erp-cli/pkg/types"
 )
 
-// Build-time variables injected by GoReleaser.
+// Build-time variables injected via ldflags (Makefile / GoReleaser).
+// When built with plain "go build", these remain at defaults and
+// init() populates them from the Go debug build info instead.
 var (
 	version = "dev"
 	commit  = "none"
 	date    = "unknown"
 )
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, s := range info.Settings {
+			switch s.Key {
+			case "vcs.revision":
+				if commit == "none" && len(s.Value) >= 7 {
+					commit = s.Value[:7]
+				}
+			case "vcs.time":
+				if date == "unknown" && s.Value != "" {
+					date = s.Value
+				}
+			case "vcs.modified":
+				if s.Value == "true" && commit != "none" {
+					commit += "-dirty"
+				}
+			}
+		}
+	}
+}
 
 // Global flags
 var (
