@@ -6,6 +6,9 @@
 
 **kubectl for D365** — a structured, scriptable CLI for Dynamics 365 Finance & Operations. Designed as the primary interface for AI agents, with full human usability.
 
+<img width="376" height="107" alt="image" src="https://github.com/user-attachments/assets/1c453612-2b4d-486b-a517-cf2d47c2ee6c" />
+
+
 <!-- TODO: Replace with actual video URL when recorded -->
 [![Demo Video](https://img.shields.io/badge/Demo-Watch%20Video-red?style=for-the-badge&logo=youtube)](https://github.com/seangalliher/D365-erp-cli)
 
