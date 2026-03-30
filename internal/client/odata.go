@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	clierrors "github.com/seangalliher/d365-erp-cli/internal/errors"
 )
@@ -257,7 +258,6 @@ type EntityTypeMatch struct {
 // A full XML parser would be more robust, but this avoids pulling in encoding/xml
 // for a simple search-and-match use case on potentially large metadata documents.
 func searchMetadataForTypes(metadata string, searchTerm string, top int) []EntityTypeMatch {
-	searchLower := strings.ToLower(searchTerm)
 	var matches []EntityTypeMatch
 
 	// Search for EntityType definitions (not EntitySet which also has EntityType attr).
@@ -273,7 +273,7 @@ func searchMetadataForTypes(metadata string, searchTerm string, top int) []Entit
 			continue
 		}
 
-		if strings.Contains(strings.ToLower(name), searchLower) {
+		if matchesSearch(name, searchTerm) {
 			matches = append(matches, EntityTypeMatch{Name: name})
 			if top > 0 && len(matches) >= top {
 				break
@@ -323,6 +323,65 @@ func findEntitySetName(metadata string, typeName string) string {
 		}
 	}
 	return ""
+}
+
+// splitPascalCase splits a PascalCase identifier into lowercase words.
+// e.g. "LedgerChartOfAccounts" -> ["ledger", "chart", "of", "accounts"]
+func splitPascalCase(name string) []string {
+	var words []string
+	var current []rune
+	runes := []rune(name)
+	for i, r := range runes {
+		if unicode.IsUpper(r) && i > 0 {
+			// Start new word if previous char was lowercase,
+			// or if next char is lowercase (handles acronyms like "HR" in "HRWorker").
+			prevLower := unicode.IsLower(runes[i-1])
+			nextLower := i+1 < len(runes) && unicode.IsLower(runes[i+1])
+			if prevLower || nextLower {
+				if len(current) > 0 {
+					words = append(words, strings.ToLower(string(current)))
+					current = nil
+				}
+			}
+		}
+		current = append(current, r)
+	}
+	if len(current) > 0 {
+		words = append(words, strings.ToLower(string(current)))
+	}
+	return words
+}
+
+// matchesSearch checks if an entity name matches a search term.
+// Single-word: substring match (backward-compatible).
+// Multi-word: ALL words must appear in the PascalCase-split name.
+func matchesSearch(name, searchTerm string) bool {
+	searchWords := strings.Fields(strings.ToLower(searchTerm))
+	if len(searchWords) == 0 {
+		return false
+	}
+	if len(searchWords) == 1 {
+		return strings.Contains(strings.ToLower(name), searchWords[0])
+	}
+	// Multi-word: check each search word against the split name
+	nameWords := splitPascalCase(name)
+	nameLower := strings.ToLower(name)
+	for _, sw := range searchWords {
+		// Check if the word appears as substring in the full name OR matches a split word
+		found := strings.Contains(nameLower, sw)
+		if !found {
+			for _, nw := range nameWords {
+				if strings.Contains(nw, sw) {
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
 }
 
 // parseODataError tries to parse an OData error response body.

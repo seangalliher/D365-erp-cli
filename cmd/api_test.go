@@ -198,6 +198,7 @@ func TestDocsCmd_ReturnsContentForValidTopic(t *testing.T) {
 		"authentication",
 		"batch-mode",
 		"enum-syntax",
+		"entities",
 	}
 
 	for _, topic := range expectedTopics {

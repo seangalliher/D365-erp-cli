@@ -411,6 +411,106 @@ func TestODataClient_FindEntityTypes_TopLimit(t *testing.T) {
 	}
 }
 
+func TestSplitPascalCase(t *testing.T) {
+	tests := []struct {
+		input string
+		want  []string
+	}{
+		{"LedgerChartOfAccounts", []string{"ledger", "chart", "of", "accounts"}},
+		{"HRWorker", []string{"hr", "worker"}},
+		{"Customer", []string{"customer"}},
+		{"SalesOrderHeader", []string{"sales", "order", "header"}},
+		{"ABCDef", []string{"abc", "def"}},
+		{"", nil},
+		{"lowercase", []string{"lowercase"}},
+		{"MainAccounts", []string{"main", "accounts"}},
+	}
+	for _, tt := range tests {
+		got := splitPascalCase(tt.input)
+		if len(got) != len(tt.want) {
+			t.Errorf("splitPascalCase(%q) = %v, want %v", tt.input, got, tt.want)
+			continue
+		}
+		for i := range got {
+			if got[i] != tt.want[i] {
+				t.Errorf("splitPascalCase(%q)[%d] = %q, want %q", tt.input, i, got[i], tt.want[i])
+			}
+		}
+	}
+}
+
+func TestMatchesSearch(t *testing.T) {
+	tests := []struct {
+		name       string
+		searchTerm string
+		want       bool
+	}{
+		// Single-word (backward compatible)
+		{"Customer", "customer", true},
+		{"CustomerGroup", "customer", true},
+		{"Vendor", "customer", false},
+		// Multi-word
+		{"LedgerChartOfAccounts", "chart accounts", true},
+		{"LedgerChartOfAccounts", "chart of accounts", true},
+		{"SalesOrderHeader", "sales order", true},
+		{"SalesOrderHeader", "purchase order", false},
+		{"MainAccounts", "main account", true},
+		{"ReleasedDistinctProducts", "released products", true},
+		// Edge cases
+		{"Customer", "", false},
+		{"Customer", "   ", false},
+	}
+	for _, tt := range tests {
+		got := matchesSearch(tt.name, tt.searchTerm)
+		if got != tt.want {
+			t.Errorf("matchesSearch(%q, %q) = %v, want %v", tt.name, tt.searchTerm, got, tt.want)
+		}
+	}
+}
+
+func TestSearchMetadataForTypes_MultiWord(t *testing.T) {
+	xml := `<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0">
+  <edmx:DataServices>
+    <Schema Namespace="Microsoft.Dynamics.DataEntities">
+      <EntityType Name="Customer">
+      </EntityType>
+      <EntityType Name="LedgerChartOfAccounts">
+      </EntityType>
+      <EntityType Name="SalesOrderHeader">
+      </EntityType>
+      <EntityType Name="MainAccount">
+      </EntityType>
+      <EntityContainer Name="Resources">
+        <EntitySet Name="Customers" EntityType="Microsoft.Dynamics.DataEntities.Customer"/>
+        <EntitySet Name="LedgerChartOfAccountsEntities" EntityType="Microsoft.Dynamics.DataEntities.LedgerChartOfAccounts"/>
+        <EntitySet Name="SalesOrderHeaders" EntityType="Microsoft.Dynamics.DataEntities.SalesOrderHeader"/>
+        <EntitySet Name="MainAccounts" EntityType="Microsoft.Dynamics.DataEntities.MainAccount"/>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>`
+
+	matches := searchMetadataForTypes(xml, "chart accounts", 10)
+	if len(matches) != 1 {
+		t.Fatalf("expected 1 match for 'chart accounts', got %d", len(matches))
+	}
+	if matches[0].Name != "LedgerChartOfAccounts" {
+		t.Errorf("expected LedgerChartOfAccounts, got %s", matches[0].Name)
+	}
+
+	matches = searchMetadataForTypes(xml, "sales order", 10)
+	if len(matches) != 1 {
+		t.Fatalf("expected 1 match for 'sales order', got %d", len(matches))
+	}
+
+	// Single word still works
+	matches = searchMetadataForTypes(xml, "customer", 10)
+	if len(matches) != 1 {
+		t.Fatalf("expected 1 match for 'customer', got %d", len(matches))
+	}
+}
+
 func TestODataClient_QueryEntities_PathForwarding(t *testing.T) {
 
 	var capturedPath string

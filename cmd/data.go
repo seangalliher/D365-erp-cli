@@ -153,7 +153,18 @@ func newFindTypeCmd() *cobra.Command {
 		Short: "Search OData entity types by keyword",
 		Long: `Search the $metadata document for EntityType definitions whose name
 contains the search term (case-insensitive). Returns up to --top results
-with the matching EntityType name and corresponding EntitySet name.`,
+with the matching EntityType name and corresponding EntitySet name.
+
+Supports multi-word search — all words must match against the PascalCase
+entity name (e.g., "chart accounts" matches LedgerChartOfAccounts).`,
+		Example: `  # Search for customer-related entities
+  d365 data find-type customer
+
+  # Multi-word search (matches PascalCase names)
+  d365 data find-type "chart accounts"
+
+  # Limit results
+  d365 data find-type sales --top 5`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
@@ -204,6 +215,14 @@ func newMetadataCmd() *cobra.Command {
 		Long: `Retrieve the OData $metadata document for the environment. The entity set
 name argument identifies the entity of interest. Use the boolean flags to
 indicate which metadata sections are desired.`,
+		Example: `  # Get basic metadata for an entity
+  d365 data metadata Customers
+
+  # Include keys and field constraints
+  d365 data metadata Customers --keys --constraints
+
+  # Include enum values (for create/update)
+  d365 data metadata SalesOrderHeaders --enums`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
@@ -276,6 +295,14 @@ AI guardrails:
 
 PowerShell: use single quotes for --query to avoid $ being interpreted:
   .\d365 data find Customers --query '$top=5&$select=CustomerAccount,Name'`,
+		Example: `  # Query top 5 customers
+  d365 data find Customers --query '$top=5&$select=CustomerAccount,Name'
+
+  # Filter by field value
+  d365 data find Vendors --query '$filter=VendorName eq ''Contoso''&$select=VendorAccountNumber,VendorName'
+
+  # Expand related entities
+  d365 data find SalesOrderHeaders --query '$top=10&$select=SalesOrderNumber&$expand=SalesOrderLines'`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
@@ -345,8 +372,13 @@ func newCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create <odataPath>",
 		Short: "Create an entity via OData POST",
-		Long:  `Create a new entity instance by POSTing JSON data to the specified OData path.`,
-		Args:  cobra.ExactArgs(1),
+		Long: `Create a new entity instance by POSTing JSON data to the specified OData path.`,
+		Example: `  # Create a new customer
+  d365 data create Customers --data '{"CustomerAccount":"CUST-001","Name":"New Customer","CustomerGroupId":"10"}'
+
+  # Create a legal entity
+  d365 data create LegalEntities --data '{"LegalEntityId":"ACME","Name":"ACME Corp","CompanyType":"Organization"}'`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 			odataPath := args[0]
@@ -406,6 +438,8 @@ The --data flag accepts a JSON array of objects, each with:
   - ODataPath: the entity path including key
     (e.g., "Customers(dataAreaId='USMF',CustomerAccount='US-001')")
   - UpdatedFieldValues: a map of field names to new values`,
+		Example: `  # Update a customer name
+  d365 data update --data '[{"ODataPath":"Customers(dataAreaId='\''USMF'\'',CustomerAccount='\''US-001'\'')","UpdatedFieldValues":{"Name":"Updated Name"}}]'`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 			dataJSON, _ := cmd.Flags().GetString("data")
@@ -476,6 +510,8 @@ REQUIRES the --confirm flag as a guardrail for this destructive operation.
 Without --confirm the command exits with a validation error.
 
 The --paths flag accepts a JSON array of OData paths to delete.`,
+		Example: `  # Delete a customer (requires --confirm)
+  d365 data delete --paths '["Customers(dataAreaId='\''USMF'\'',CustomerAccount='\''US-001'\'')"]' --confirm`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
 

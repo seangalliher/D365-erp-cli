@@ -13,6 +13,49 @@ func init() {
 	rootCmd.AddCommand(newAgentPromptCmd())
 }
 
+// entityCatalogEntry describes a common D365 F&O data entity.
+type entityCatalogEntry struct {
+	EntitySet   string
+	Description string
+	KeyFields   string
+}
+
+// commonEntities is the catalog of frequently-used D365 F&O data entities.
+// Included in the agent system prompt so AI agents can skip entity discovery.
+var commonEntities = []entityCatalogEntry{
+	// Master Data
+	{"Customers", "Customer master records", "dataAreaId, CustomerAccount"},
+	{"Vendors", "Vendor/supplier master records", "dataAreaId, VendorAccountNumber"},
+	{"ReleasedDistinctProducts", "Released product masters", "ProductNumber"},
+	{"ReleasedProducts", "Released products per company (variants)", "dataAreaId, ItemNumber"},
+	{"InventWarehouses", "Warehouse definitions", "dataAreaId, WarehouseId"},
+	{"InventSites", "Site definitions", "dataAreaId, SiteId"},
+	// Sales
+	{"SalesOrderHeaders", "Sales order headers", "dataAreaId, SalesOrderNumber"},
+	{"SalesOrderLines", "Sales order line items", "dataAreaId, SalesOrderNumber, LineNumber"},
+	// Purchasing
+	{"PurchaseOrderHeaders", "Purchase order headers", "dataAreaId, PurchaseOrderNumber"},
+	{"PurchaseOrderLines", "Purchase order line items", "dataAreaId, PurchaseOrderNumber, LineNumber"},
+	// Financials
+	{"LegalEntities", "Legal entities / companies", "LegalEntityId"},
+	{"MainAccounts", "Chart of accounts main accounts", "dataAreaId, MainAccountId, ChartOfAccounts"},
+	{"LedgerChartOfAccounts", "Chart of accounts definitions", "ChartOfAccounts"},
+	{"Ledgers", "Ledger configuration per company", "dataAreaId"},
+	{"GeneralJournalHeaders", "General journal batch headers", "dataAreaId, JournalBatchNumber"},
+	{"GeneralJournalLines", "General journal lines", "dataAreaId, JournalBatchNumber, LineNumber"},
+	// Inventory
+	{"InventoryOnhandEntities", "On-hand inventory balances", "dataAreaId, ItemNumber"},
+	{"ItemGroups", "Item group classifications", "dataAreaId, ItemGroupId"},
+	// HR
+	{"Workers", "Worker records (all worker types)", "PersonnelNumber"},
+	{"Employees", "Employee records", "PersonnelNumber"},
+	{"Positions", "HR positions", "PositionId"},
+	// Configuration
+	{"CompanyInfoEntities", "Company information / settings", "dataAreaId"},
+	{"NumberSequences", "Number sequence definitions", "dataAreaId, NumberSequenceCode"},
+	{"SystemParameters", "System-wide parameters", "Key1"},
+}
+
 func newAgentPromptCmd() *cobra.Command {
 	var asJSON bool
 
@@ -106,6 +149,17 @@ func buildAgentPrompt() string {
 	sb.WriteString("- `data delete` requires `--confirm` flag\n")
 	sb.WriteString("- Wide queries (no `$top`) trigger warnings\n")
 	sb.WriteString("- Enum values must use symbol names, not integers\n\n")
+
+	// Common entity catalog
+	sb.WriteString("## Common D365 Entities\n\n")
+	sb.WriteString("Use these entity set names with `data find`, `data create`, etc. This saves a `find-type` round trip.\n\n")
+	sb.WriteString("| Entity Set | Description | Key Fields |\n")
+	sb.WriteString("|---|---|---|\n")
+	for _, e := range commonEntities {
+		fmt.Fprintf(&sb, "| `%s` | %s | %s |\n", e.EntitySet, e.Description, e.KeyFields)
+	}
+	sb.WriteString("\nFor the full reference, run `d365 docs entities`.\n")
+	sb.WriteString("To search for entities not listed above, use `d365 data find-type <keyword>` (supports multi-word search).\n\n")
 
 	// Workflows
 	sb.WriteString("## Common Workflows\n\n")

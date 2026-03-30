@@ -187,6 +187,129 @@ When creating or updating entities, pass the enum symbol name as a string:
 - When creating/updating, use just the symbol name string.
 `,
 	},
+	"entities": {
+		Title: "Common D365 F&O Data Entities Reference",
+		Content: `# Common D365 F&O Data Entities Reference
+
+A quick-reference for the most frequently used OData entity sets in Dynamics 365 Finance & Operations. Use these names with ` + "`d365 data find`" + `, ` + "`d365 data create`" + `, etc.
+
+Tip: Use ` + "`d365 data find-type <keyword>`" + ` to search for entities not listed here. Multi-word searches work (e.g., "chart accounts").
+
+## Master Data
+
+### Customers
+- **Entity set:** ` + "`Customers`" + `
+- **Key fields:** dataAreaId, CustomerAccount
+- **Common fields:** Name, CustomerGroupId, AddressCity, AddressState, Currency
+- **Example:** ` + "`d365 data find Customers --query '$top=5&$select=CustomerAccount,Name'`" + `
+
+### Vendors
+- **Entity set:** ` + "`Vendors`" + `
+- **Key fields:** dataAreaId, VendorAccountNumber
+- **Common fields:** VendorName, VendorGroupId, Currency, AddressCity
+- **Example:** ` + "`d365 data find Vendors --query '$top=5&$select=VendorAccountNumber,VendorName'`" + `
+
+### Products
+- **Entity set:** ` + "`ReleasedDistinctProducts`" + ` (product masters) or ` + "`ReleasedProducts`" + ` (per-company variants)
+- **Key fields:** ProductNumber (masters) or dataAreaId, ItemNumber (released)
+- **Common fields:** ProductName, ProductType, SearchName
+- **Example:** ` + "`d365 data find ReleasedDistinctProducts --query '$top=5&$select=ProductNumber,ProductName'`" + `
+
+### Warehouses
+- **Entity set:** ` + "`InventWarehouses`" + `
+- **Key fields:** dataAreaId, WarehouseId
+- **Common fields:** WarehouseName, SiteId
+
+### Sites
+- **Entity set:** ` + "`InventSites`" + `
+- **Key fields:** dataAreaId, SiteId
+- **Common fields:** SiteName
+
+## Sales
+
+### Sales Orders
+- **Header entity set:** ` + "`SalesOrderHeaders`" + `
+- **Key fields:** dataAreaId, SalesOrderNumber
+- **Common fields:** OrderingCustomerAccountNumber, InvoiceCustomerAccountNumber, SalesOrderStatus
+- **Line entity set:** ` + "`SalesOrderLines`" + `
+- **Line key fields:** dataAreaId, SalesOrderNumber, LineNumber
+- **Example:** ` + "`d365 data find SalesOrderHeaders --query '$top=5&$select=SalesOrderNumber,OrderingCustomerAccountNumber'`" + `
+
+## Purchasing
+
+### Purchase Orders
+- **Header entity set:** ` + "`PurchaseOrderHeaders`" + `
+- **Key fields:** dataAreaId, PurchaseOrderNumber
+- **Common fields:** OrderVendorAccountNumber, PurchaseOrderStatus
+- **Line entity set:** ` + "`PurchaseOrderLines`" + `
+- **Line key fields:** dataAreaId, PurchaseOrderNumber, LineNumber
+- **Example:** ` + "`d365 data find PurchaseOrderHeaders --query '$top=5&$select=PurchaseOrderNumber,OrderVendorAccountNumber'`" + `
+
+## Financials
+
+### Legal Entities
+- **Entity set:** ` + "`LegalEntities`" + `
+- **Key fields:** LegalEntityId
+- **Common fields:** Name, CompanyType, AddressCountryRegion
+- **Example:** ` + "`d365 data find LegalEntities --query '$select=LegalEntityId,Name'`" + `
+
+### Main Accounts
+- **Entity set:** ` + "`MainAccounts`" + `
+- **Key fields:** dataAreaId, MainAccountId, ChartOfAccounts
+- **Common fields:** Name, MainAccountType
+- **Example:** ` + "`d365 data find MainAccounts --query '$top=10&$select=MainAccountId,Name,MainAccountType'`" + `
+
+### Chart of Accounts
+- **Entity set:** ` + "`LedgerChartOfAccounts`" + `
+- **Key fields:** ChartOfAccounts
+- **Common fields:** Description
+
+### Ledger
+- **Entity set:** ` + "`Ledgers`" + `
+- **Key fields:** dataAreaId
+- **Common fields:** ChartOfAccounts, Name, AccountingCurrency, FiscalCalendar
+
+### General Journal
+- **Header entity set:** ` + "`GeneralJournalHeaders`" + `
+- **Key fields:** dataAreaId, JournalBatchNumber
+- **Line entity set:** ` + "`GeneralJournalLines`" + `
+- **Line key fields:** dataAreaId, JournalBatchNumber, LineNumber
+
+## Inventory
+
+### On-Hand Inventory
+- **Entity set:** ` + "`InventoryOnhandEntities`" + `
+- **Key fields:** dataAreaId, ItemNumber
+- **Common fields:** AvailableQuantity, OnOrderQuantity
+
+### Item Groups
+- **Entity set:** ` + "`ItemGroups`" + `
+- **Key fields:** dataAreaId, ItemGroupId
+- **Common fields:** ItemGroupName
+
+## Human Resources
+
+### Workers
+- **Entity set:** ` + "`Workers`" + ` (all types) or ` + "`Employees`" + ` (employees only)
+- **Key fields:** PersonnelNumber
+- **Common fields:** FirstName, LastName, EmploymentStartDate
+
+### Positions
+- **Entity set:** ` + "`Positions`" + `
+- **Key fields:** PositionId
+- **Common fields:** Description, Department, Job
+
+## Configuration
+
+### Company Info
+- **Entity set:** ` + "`CompanyInfoEntities`" + `
+- **Key fields:** dataAreaId
+
+### Number Sequences
+- **Entity set:** ` + "`NumberSequences`" + `
+- **Key fields:** dataAreaId, NumberSequenceCode
+`,
+	},
 }
 
 // newDocsCmd creates the "docs" command for inline documentation.
@@ -200,7 +323,7 @@ Run without arguments to list all available topics.
 Provide a topic name to view its documentation.
 
 Available topics: odata-filters, form-workflow, authentication,
-batch-mode, enum-syntax`,
+batch-mode, enum-syntax, entities`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			start := time.Now()
