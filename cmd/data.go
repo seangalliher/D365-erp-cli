@@ -372,7 +372,7 @@ func newCreateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create <odataPath>",
 		Short: "Create an entity via OData POST",
-		Long: `Create a new entity instance by POSTing JSON data to the specified OData path.`,
+		Long:  `Create a new entity instance by POSTing JSON data to the specified OData path.`,
 		Example: `  # Create a new customer
   d365 data create Customers --data '{"CustomerAccount":"CUST-001","Name":"New Customer","CustomerGroupId":"10"}'
 

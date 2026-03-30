@@ -43,6 +43,3 @@ coverage.html
 # Internal docs (not for publishing)
 Prompts/
 Vibes/
-
-# Demo recording (personal, not published)
-examples/*/demo/
