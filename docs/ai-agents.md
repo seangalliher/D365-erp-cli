@@ -36,20 +36,15 @@ Copilot uses the D365 CLI to execute each step automatically:
 
 ```bash
 # Step 1 — Check if ACME already exists (creates are NOT idempotent)
-$ d365 data find LegalEntities --query '$filter=LegalEntityId eq ''ACME''&$select=LegalEntityId,Name' --timeout 60
+$ d365 data find LegalEntities --query '$filter=LegalEntityId eq '"'"'ACME'"'"'&$select=LegalEntityId,Name' --timeout 60
 ✓ Empty result — safe to create
 
-# Step 2 — Create the legal entity
-$ d365 data create LegalEntities --data '{
-    "LegalEntityId": "ACME",
-    "Name": "ACME Corp",
-    "CompanyType": "Organization",
-    "AddressCountryRegion": "USA"
-  }' --timeout 60
-✓ Created LegalEntities(dataAreaId='ACME')
+# Step 2 — Create the legal entity (use minimal fields only)
+$ d365 data create LegalEntities --data '{"LegalEntityId":"ACME","Name":"ACME Corp"}' --timeout 60
+✓ Created LegalEntities(LegalEntityId='ACME')
 
 # Step 3 — Verify it was created
-$ d365 data find LegalEntities --query '$filter=LegalEntityId eq ''ACME''&$select=LegalEntityId,Name' --timeout 60
+$ d365 data find LegalEntities --query '$filter=LegalEntityId eq '"'"'ACME'"'"'&$select=LegalEntityId,Name' --timeout 60
 ✓ Found: ACME — ACME Corp
 
 # Step 4 — Switch context to the new company
@@ -57,20 +52,11 @@ $ d365 company set ACME
 ✓ Company set to ACME
 
 # Step 5 — Create chart of accounts
-$ d365 data create LedgerChartOfAccounts --data '{
-    "ChartOfAccounts": "ACME-COA",
-    "Description": "ACME Corp Chart of Accounts"
-  }' --timeout 60
-✓ Created LedgerChartOfAccounts('ACME-COA')
+$ d365 data create ChartOfAccounts --data '{"ChartOfAccounts":"ACME-COA","Description":"ACME Corp Chart of Accounts"}' --timeout 60
+✓ Created ChartOfAccounts('ACME-COA')
 
-# Step 6 — Configure the general ledger
-$ d365 data create Ledgers --data '{
-    "ChartOfAccounts": "ACME-COA",
-    "Name": "ACME General Ledger",
-    "AccountingCurrency": "USD",
-    "ReportingCurrency": "USD",
-    "FiscalCalendar": "Standard"
-  }' --timeout 60
+# Step 6 — Configure the general ledger (requires LegalEntityId; Name is read-only)
+$ d365 data create Ledgers --data '{"LegalEntityId":"ACME","ChartOfAccounts":"ACME-COA","AccountingCurrency":"USD","ReportingCurrency":"USD","FiscalCalendar":"Standard"}' --timeout 60
 ✓ Created Ledgers for ACME
 
 # Step 7 — Create main accounts
@@ -84,7 +70,7 @@ $ d365 data create MainAccounts --data '{"MainAccountId":"610100","Name":"Operat
 $ d365 data create MainAccounts --data '{"MainAccountId":"620100","Name":"Payroll Expense","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
 
 # Step 8 — Verify the setup
-$ d365 data find MainAccounts --query '$filter=ChartOfAccounts eq ''ACME-COA''&$select=MainAccountId,Name,MainAccountType' --timeout 60
+$ d365 data find MainAccounts --query '$filter=ChartOfAccounts eq '"'"'ACME-COA'"'"'&$select=MainAccountId,Name,MainAccountType' --timeout 60
 ✓ 8 accounts created
 ```
 

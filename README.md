@@ -78,24 +78,24 @@ The D365 MCP server works well inside tools that support it (VS Code, Claude Des
 
 | | MCP Server | D365 CLI |
 |---|---|---|
-| **Tool definitions** | 21 tools injected into context on *every message* (~5,300 tokens/turn) | 1 tool (Bash) — ~100 tokens/turn |
+| **Tool definitions** | 21 tools injected into context on *every message* (~2,900 tokens/turn) | 1 tool (Bash) — ~100 tokens/turn |
 | **Entity discovery** | Agent must call `find-type` → `metadata` → create (3+ round trips) | Entity catalog baked into system prompt (0 round trips) |
-| **Metadata responses** | Full entity schema returned (~thousands of tokens) | `--keys` flag returns only key fields |
-| **Per-turn overhead** | ~5,300 tokens | ~100 tokens |
+| **Metadata responses** | Full entity schema returned (~2,000-5,000 tokens each) | `--keys` flag returns only key fields |
+| **Per-turn overhead** | ~2,900 tokens | ~100 tokens |
 | **Scriptable** | No — protocol-bound to host tool | Yes — shell scripts, CI/CD, pipelines |
 | **Schedulable** | No | Yes — cron, batch, automation |
 
 ### Token savings over a typical workflow
 
-The CLI's one-time system prompt (`d365 agent-prompt`) costs ~2,880 tokens. After that, each turn only adds ~100 tokens for the Bash tool definition — compared to ~5,300 tokens per turn for MCP tool schemas.
+The CLI's one-time system prompt (`d365 agent-prompt`) costs ~2,500 tokens. After that, each turn only adds ~100 tokens for the Bash tool definition — compared to ~2,900 tokens per turn for MCP tool schemas.
 
 | Workflow length | MCP input tokens | CLI input tokens | Savings |
 |---|---|---|---|
-| 10 turns | ~53,000 | ~3,900 | **93%** |
-| 15 turns | ~79,500 | ~4,400 | **94%** |
-| 20 turns | ~106,000 | ~4,900 | **95%** |
+| 10 turns | ~29,000 | ~3,500 | **88%** |
+| 15 turns | ~44,000 | ~4,000 | **91%** |
+| 20 turns | ~58,000 | ~4,500 | **92%** |
 
-> These estimates cover tool definition overhead only. The real savings are larger because MCP's extra discovery round trips (find-type, metadata) also generate conversation history that compounds across turns.
+> These estimates cover tool definition overhead only. The real savings are larger because MCP's extra discovery round trips (find-type, metadata) generate conversation history that compounds across turns — typically adding another 5,000-15,000 tokens per workflow.
 
 ## Architecture
 

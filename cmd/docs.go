@@ -260,13 +260,13 @@ Tip: Use ` + "`d365 data find-type <keyword>`" + ` to search for entities not li
 - **Example:** ` + "`d365 data find MainAccounts --query '$top=10&$select=MainAccountId,Name,MainAccountType'`" + `
 
 ### Chart of Accounts
-- **Entity set:** ` + "`LedgerChartOfAccounts`" + `
+- **Entity set:** ` + "`ChartOfAccounts`" + ` (for create/update) or ` + "`LedgerChartOfAccounts`" + ` (read-only view)
 - **Key fields:** ChartOfAccounts
 - **Common fields:** Description
 
 ### Ledger
 - **Entity set:** ` + "`Ledgers`" + `
-- **Key fields:** dataAreaId
+- **Key fields:** LegalEntityId
 - **Common fields:** ChartOfAccounts, Name, AccountingCurrency, FiscalCalendar
 
 ### General Journal

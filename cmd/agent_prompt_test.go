@@ -92,6 +92,7 @@ func TestBuildAgentPrompt_ContainsEntityCatalog(t *testing.T) {
 		"SalesOrderHeaders",
 		"LegalEntities",
 		"MainAccounts",
+		"ChartOfAccounts",
 		"LedgerChartOfAccounts",
 	}
 	for _, e := range entities {

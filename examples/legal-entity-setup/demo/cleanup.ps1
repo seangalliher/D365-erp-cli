@@ -35,13 +35,13 @@ foreach ($acct in $accounts) {
 
 # Delete ledger
 Write-Host "[3/4] Deleting ledger and chart of accounts..." -ForegroundColor Yellow
-& $d365 data delete --paths "[""Ledgers(dataAreaId='ACME')""]" --confirm 2>$null
-& $d365 data delete --paths "[""LedgerChartOfAccounts(ChartOfAccounts='ACME-COA')""]" --confirm 2>$null
+& $d365 data delete --paths "[""Ledgers(LegalEntityId='ACME')""]" --confirm 2>$null
+& $d365 data delete --paths "[""ChartOfAccounts(ChartOfAccounts='ACME-COA')""]" --confirm 2>$null
 
 # Switch back to default company and delete legal entity
-Write-Host "[4/4] Deleting ACME legal entity..." -ForegroundColor Yellow
+Write-Host "[4/4] Deleting ACME legal entity (this may take up to 60 seconds)..." -ForegroundColor Yellow
 & $d365 company set ""
-& $d365 data delete --paths "[""LegalEntities(LegalEntityId='ACME')""]" --confirm 2>$null
+& $d365 data delete --paths "[""LegalEntities(LegalEntityId='ACME')""]" --confirm --timeout 120
 
 Write-Host ""
 Write-Host "=== Cleanup complete ===" -ForegroundColor Green

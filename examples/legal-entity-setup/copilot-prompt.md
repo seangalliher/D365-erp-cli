@@ -6,7 +6,7 @@ Use `./d365` (or `d365` if it's on your PATH) to run commands.
 ## Important Rules
 
 - **Use ONLY the `./d365` CLI tool** — do NOT use MCP tools, MCP servers, or any other D365 integration. All operations must go through `./d365` commands.
-- **Always use single quotes** for `--query` values (OData `$` parameters conflict with shell variable expansion)
+- **Always use single quotes** for `--query` values (OData `$` parameters conflict with shell variable expansion). To embed OData string literals, use `'"'"'value'"'"'` (bash) — do NOT use `''` (that's PowerShell syntax).
 - **Creates are NOT idempotent** — always query first to check if a record already exists before creating it
 - **Verify after every create** — re-query the record to confirm it was created successfully
 - **Use the exact entity set names** listed below — do not guess or search for them
@@ -20,8 +20,8 @@ Use these exact entity set names — no need to call `find-type`:
 | Entity Set | Description | Key Fields |
 |-----------|-------------|------------|
 | LegalEntities | Legal entities / companies | LegalEntityId |
-| LedgerChartOfAccounts | Chart of accounts definitions | ChartOfAccounts |
-| Ledgers | Ledger configuration per company | dataAreaId |
+| ChartOfAccounts | Chart of accounts definitions | ChartOfAccounts |
+| Ledgers | Ledger configuration per company | LegalEntityId |
 | MainAccounts | Chart of accounts main accounts | dataAreaId, MainAccountId, ChartOfAccounts |
 
 ## Task
@@ -34,17 +34,17 @@ Create a new legal entity called **ACME Corp** with the company ID **ACME**, the
 
 First check it doesn't exist:
 ```
-./d365 data find LegalEntities --query '$filter=LegalEntityId eq ''ACME''&$select=LegalEntityId,Name' --timeout 60
+./d365 data find LegalEntities --query '$filter=LegalEntityId eq '"'"'ACME'"'"'&$select=LegalEntityId,Name' --timeout 60
 ```
 
-If the result `value` array is empty, create it:
+If the result `value` array is empty, create it (use minimal fields only — extra fields like CompanyType or AddressCountryRegion cause errors):
 ```
-./d365 data create LegalEntities --data '{"LegalEntityId":"ACME","Name":"ACME Corp","CompanyType":"Organization","AddressCountryRegion":"USA"}' --timeout 60
+./d365 data create LegalEntities --data '{"LegalEntityId":"ACME","Name":"ACME Corp"}' --timeout 60
 ```
 
 Verify it was created:
 ```
-./d365 data find LegalEntities --query '$filter=LegalEntityId eq ''ACME''&$select=LegalEntityId,Name' --timeout 60
+./d365 data find LegalEntities --query '$filter=LegalEntityId eq '"'"'ACME'"'"'&$select=LegalEntityId,Name' --timeout 60
 ```
 
 ### 2. Switch to the new company
@@ -56,18 +56,19 @@ Verify it was created:
 ### 3. Create a chart of accounts
 
 ```
-./d365 data create LedgerChartOfAccounts --data '{"ChartOfAccounts":"ACME-COA","Description":"ACME Corp Chart of Accounts"}' --timeout 60
+./d365 data create ChartOfAccounts --data '{"ChartOfAccounts":"ACME-COA","Description":"ACME Corp Chart of Accounts"}' --timeout 60
 ```
 
 Verify:
 ```
-./d365 data find LedgerChartOfAccounts --query '$filter=ChartOfAccounts eq ''ACME-COA''&$select=ChartOfAccounts,Description' --timeout 60
+./d365 data find ChartOfAccounts --query '$filter=ChartOfAccounts eq '"'"'ACME-COA'"'"'&$select=ChartOfAccounts,Description' --timeout 60
 ```
 
 ### 4. Configure the general ledger
 
+The Ledgers entity requires `LegalEntityId` explicitly. The `Name` field is read-only and cannot be set on insert.
 ```
-./d365 data create Ledgers --data '{"ChartOfAccounts":"ACME-COA","Name":"ACME General Ledger","AccountingCurrency":"USD","ReportingCurrency":"USD","FiscalCalendar":"Standard"}' --timeout 60
+./d365 data create Ledgers --data '{"LegalEntityId":"ACME","ChartOfAccounts":"ACME-COA","AccountingCurrency":"USD","ReportingCurrency":"USD","FiscalCalendar":"Standard"}' --timeout 60
 ```
 
 ### 5. Create main accounts
@@ -94,7 +95,7 @@ Example for the first account:
 
 Query all accounts under the chart of accounts:
 ```
-./d365 data find MainAccounts --query '$filter=ChartOfAccounts eq ''ACME-COA''&$select=MainAccountId,Name,MainAccountType' --timeout 60
+./d365 data find MainAccounts --query '$filter=ChartOfAccounts eq '"'"'ACME-COA'"'"'&$select=MainAccountId,Name,MainAccountType' --timeout 60
 ```
 
 Expected: 8 main accounts returned.

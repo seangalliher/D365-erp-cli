@@ -39,8 +39,9 @@ var commonEntities = []entityCatalogEntry{
 	// Financials
 	{"LegalEntities", "Legal entities / companies", "LegalEntityId"},
 	{"MainAccounts", "Chart of accounts main accounts", "dataAreaId, MainAccountId, ChartOfAccounts"},
-	{"LedgerChartOfAccounts", "Chart of accounts definitions", "ChartOfAccounts"},
-	{"Ledgers", "Ledger configuration per company", "dataAreaId"},
+	{"ChartOfAccounts", "Chart of accounts definitions (use for create/update)", "ChartOfAccounts"},
+	{"LedgerChartOfAccounts", "Chart of accounts (read-only view)", "ChartOfAccounts"},
+	{"Ledgers", "Ledger configuration per company", "LegalEntityId"},
 	{"GeneralJournalHeaders", "General journal batch headers", "dataAreaId, JournalBatchNumber"},
 	{"GeneralJournalLines", "General journal lines", "dataAreaId, JournalBatchNumber, LineNumber"},
 	// Inventory
