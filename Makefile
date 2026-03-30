@@ -4,7 +4,7 @@ BINARY_NAME := d365
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "none")
 DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
-LDFLAGS := -ldflags="-s -w -X github.com/d365-cli/d365/cmd.version=$(VERSION) -X github.com/d365-cli/d365/cmd.commit=$(COMMIT) -X github.com/d365-cli/d365/cmd.date=$(DATE)"
+LDFLAGS := -ldflags="-s -w -X github.com/seangalliher/d365-erp-cli/cmd.version=$(VERSION) -X github.com/seangalliher/d365-erp-cli/cmd.commit=$(COMMIT) -X github.com/seangalliher/d365-erp-cli/cmd.date=$(DATE)"
 
 .PHONY: build test lint test-coverage clean install release fmt vet
 
