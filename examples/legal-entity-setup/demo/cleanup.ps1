@@ -27,7 +27,7 @@ Write-Host "[1/4] Switching to ACME company..." -ForegroundColor Yellow
 
 # Delete main accounts
 Write-Host "[2/4] Deleting main accounts..." -ForegroundColor Yellow
-$accounts = @("110100", "120100", "200100", "210100", "300100", "310100", "400100", "410100", "500100", "510100", "600100", "610100", "620100")
+$accounts = @("110100", "120100", "210100", "310100", "410100", "510100", "610100", "620100")
 foreach ($acct in $accounts) {
     Write-Host "  Deleting MainAccount $acct"
     & $d365 data delete --paths "[""MainAccounts(dataAreaId='ACME',MainAccountId='$acct',ChartOfAccounts='ACME-COA')""]" --confirm 2>$null

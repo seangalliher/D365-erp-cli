@@ -74,14 +74,14 @@ $ d365 data create Ledgers --data '{
 ✓ Created Ledgers for ACME
 
 # Step 7 — Create main accounts
-$ d365 data create MainAccounts --data '{"MainAccountId":"110100","Name":"Cash - Operating","MainAccountType":"BalanceSheet","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"120100","Name":"Accounts Receivable","MainAccountType":"BalanceSheet","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"200100","Name":"Accounts Payable","MainAccountType":"BalanceSheet","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"300100","Name":"Retained Earnings","MainAccountType":"BalanceSheet","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"400100","Name":"Revenue","MainAccountType":"Revenue","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"500100","Name":"Cost of Goods Sold","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"600100","Name":"Operating Expenses","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
-$ d365 data create MainAccounts --data '{"MainAccountId":"610100","Name":"Payroll Expenses","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"110100","Name":"Cash","MainAccountType":"Asset","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"120100","Name":"Accounts Receivable","MainAccountType":"Asset","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"210100","Name":"Accounts Payable","MainAccountType":"Liability","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"310100","Name":"Retained Earnings","MainAccountType":"Equity","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"410100","Name":"Revenue","MainAccountType":"Revenue","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"510100","Name":"Cost of Goods Sold","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"610100","Name":"Operating Expenses","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
+$ d365 data create MainAccounts --data '{"MainAccountId":"620100","Name":"Payroll Expense","MainAccountType":"Expense","ChartOfAccounts":"ACME-COA"}' --timeout 60
 
 # Step 8 — Verify the setup
 $ d365 data find MainAccounts --query '$filter=ChartOfAccounts eq ''ACME-COA''&$select=MainAccountId,Name,MainAccountType' --timeout 60

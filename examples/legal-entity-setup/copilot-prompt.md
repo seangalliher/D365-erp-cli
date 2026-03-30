@@ -5,11 +5,13 @@ Use `./d365` (or `d365` if it's on your PATH) to run commands.
 
 ## Important Rules
 
+- **Use ONLY the `./d365` CLI tool** — do NOT use MCP tools, MCP servers, or any other D365 integration. All operations must go through `./d365` commands.
 - **Always use single quotes** for `--query` values (OData `$` parameters conflict with shell variable expansion)
 - **Creates are NOT idempotent** — always query first to check if a record already exists before creating it
 - **Verify after every create** — re-query the record to confirm it was created successfully
 - **Use the exact entity set names** listed below — do not guess or search for them
 - **Include `--timeout 60`** on data commands — D365 can be slow on first requests
+- **Use `--keys` when checking metadata** — `./d365 data metadata <Entity> --keys` returns only key fields, avoiding large responses
 
 ## Entity Reference
 
@@ -72,20 +74,20 @@ Verify:
 
 Create each account one at a time. All accounts use `ChartOfAccounts: ACME-COA`.
 
-| Account ID | Name                | Type         |
-|-----------|---------------------|--------------|
-| 110100    | Cash - Operating     | BalanceSheet |
-| 120100    | Accounts Receivable  | BalanceSheet |
-| 200100    | Accounts Payable     | BalanceSheet |
-| 300100    | Retained Earnings    | BalanceSheet |
-| 400100    | Revenue              | Revenue      |
-| 500100    | Cost of Goods Sold   | Expense      |
-| 600100    | Operating Expenses   | Expense      |
-| 610100    | Payroll Expenses     | Expense      |
+| Account ID | Name                | Type       |
+|-----------|---------------------|------------|
+| 110100    | Cash                 | Asset      |
+| 120100    | Accounts Receivable  | Asset      |
+| 210100    | Accounts Payable     | Liability  |
+| 310100    | Retained Earnings    | Equity     |
+| 410100    | Revenue              | Revenue    |
+| 510100    | Cost of Goods Sold   | Expense    |
+| 610100    | Operating Expenses   | Expense    |
+| 620100    | Payroll Expense      | Expense    |
 
 Example for the first account:
 ```
-./d365 data create MainAccounts --data '{"MainAccountId":"110100","Name":"Cash - Operating","MainAccountType":"BalanceSheet","ChartOfAccounts":"ACME-COA"}' --timeout 60
+./d365 data create MainAccounts --data '{"MainAccountId":"110100","Name":"Cash","MainAccountType":"Asset","ChartOfAccounts":"ACME-COA"}' --timeout 60
 ```
 
 ### 6. Verify the setup
@@ -102,4 +104,4 @@ Expected: 8 main accounts returned.
 - If a create returns an error, read the error message carefully — it often tells you exactly what's wrong
 - If you get a 409 Conflict, the record already exists — move to the next step
 - If you get a timeout, retry with `--timeout 120`
-- Use `./d365 data metadata <EntitySet>` to inspect available fields if needed
+- Use `./d365 data metadata <EntitySet> --keys` to inspect key fields (use `--keys` to keep the response small)
