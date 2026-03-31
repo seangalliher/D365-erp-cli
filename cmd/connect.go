@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -10,6 +11,7 @@ import (
 	"github.com/seangalliher/d365-erp-cli/internal/auth"
 	"github.com/seangalliher/d365-erp-cli/internal/config"
 	"github.com/seangalliher/d365-erp-cli/internal/errors"
+	"github.com/seangalliher/d365-erp-cli/internal/output"
 )
 
 var connectCmd = &cobra.Command{
@@ -129,6 +131,36 @@ func runConnect(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	// Persist auth settings to the config profile so subsequent commands
+	// can re-authenticate without requiring env vars or flags.
+	// Client secrets are never written to disk for security.
+	if cfg, err := config.Load(); err == nil {
+		profile := cfg.ActiveProfile(flagProfile)
+		profile.AuthMethod = connectAuthMethod
+		profile.Environment = environmentURL
+		if connectTenant != "" {
+			profile.TenantID = connectTenant
+		}
+		if connectClientID != "" {
+			profile.ClientID = connectClientID
+		}
+		// Ensure the profile has a name for SetProfile.
+		if profile.Name == "" {
+			name := flagProfile
+			if name == "" {
+				name = cfg.DefaultProfile
+			}
+			if name == "" {
+				name = "default"
+			}
+			profile.Name = name
+		}
+		cfg.SetProfile(profile)
+		if saveErr := cfg.Save(); saveErr != nil {
+			fmt.Fprintf(os.Stderr, "Warning: could not save auth settings to profile: %v\n", saveErr)
+		}
+	}
+
 	data := map[string]interface{}{
 		"connected":    true,
 		"environment":  sess.Environment,
@@ -139,5 +171,17 @@ func runConnect(cmd *cobra.Command, args []string) error {
 	}
 
 	RenderSuccess(cmd, data, start)
+
+	// Show a hint for client-credentials users: the secret is not persisted.
+	if connectAuthMethod == auth.MethodClientCredential && output.IsTerminal(os.Stderr) {
+		fmt.Fprintln(os.Stderr)
+		fmt.Fprintln(os.Stderr, "Tip: Your auth method, tenant, and client ID have been saved to your profile.")
+		fmt.Fprintln(os.Stderr, "     The client secret is NOT saved (security). For subsequent commands, set it as")
+		fmt.Fprintln(os.Stderr, "     an environment variable so the CLI can re-authenticate automatically:")
+		fmt.Fprintln(os.Stderr)
+		fmt.Fprintln(os.Stderr, "  PowerShell:   $env:D365_CLIENT_SECRET = \"your-secret\"")
+		fmt.Fprintln(os.Stderr, "  Bash / Linux: export D365_CLIENT_SECRET=\"your-secret\"")
+	}
+
 	return nil
 }

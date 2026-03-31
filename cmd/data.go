@@ -78,7 +78,7 @@ func getTokenProvider(envURL string) (client.TokenProvider, error) {
 
 	authenticator, err := auth.NewAuthenticator(method, authCfg)
 	if err != nil {
-		return nil, err
+		return nil, enrichAuthError(method, authCfg, err)
 	}
 
 	return func(ctx context.Context) (string, error) {
@@ -88,6 +88,32 @@ func getTokenProvider(envURL string) (client.TokenProvider, error) {
 		}
 		return tok.AccessToken, nil
 	}, nil
+}
+
+// enrichAuthError produces a targeted error message when auth fails after
+// a previous connect. Instead of generic "tenant is required for browser
+// auth", it tells the user exactly what is missing and how to fix it.
+func enrichAuthError(method string, cfg auth.ProviderConfig, original error) error {
+	switch method {
+	case auth.MethodClientCredential:
+		if cfg.ClientSecret == "" {
+			return clierrors.AuthConfigError(method, "client-secret")
+		}
+		if cfg.TenantID == "" {
+			return clierrors.AuthConfigError(method, "tenant")
+		}
+		if cfg.ClientID == "" {
+			return clierrors.AuthConfigError(method, "client-id")
+		}
+	case auth.MethodBrowser, auth.MethodDeviceCode:
+		if cfg.TenantID == "" {
+			return clierrors.AuthConfigError(method, "tenant")
+		}
+		if cfg.ClientID == "" {
+			return clierrors.AuthConfigError(method, "client-id")
+		}
+	}
+	return clierrors.AsCLIError(original)
 }
 
 // parseRawQueryOptions parses a raw OData query options string (e.g.

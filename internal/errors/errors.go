@@ -153,6 +153,34 @@ func TimeoutError(operation string) *CLIError {
 	}
 }
 
+// AuthConfigError creates an error for missing auth configuration after a
+// successful connect. The field name is mapped to its environment variable
+// so the suggestion is immediately actionable.
+func AuthConfigError(method, missingField string) *CLIError {
+	envVar := envVarForField(missingField)
+	return &CLIError{
+		Code:    types.ErrCodeAuthentication,
+		Message: fmt.Sprintf("your saved profile uses %q auth, but %s is not set", method, missingField),
+		Suggestion: fmt.Sprintf(
+			"Set the %s environment variable, or reconnect:\n  d365 connect <url> --auth %s",
+			envVar, method),
+	}
+}
+
+// envVarForField maps an auth field name to its D365_* environment variable.
+func envVarForField(field string) string {
+	switch field {
+	case "client-secret":
+		return "D365_CLIENT_SECRET"
+	case "tenant":
+		return "D365_TENANT_ID"
+	case "client-id":
+		return "D365_CLIENT_ID"
+	default:
+		return "D365_" + field
+	}
+}
+
 // AsCLIError attempts to convert an error to a CLIError.
 // Returns the CLIError if successful, or wraps the error if not.
 func AsCLIError(err error) *CLIError {

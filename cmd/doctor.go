@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"os"
 	"os/exec"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/seangalliher/d365-erp-cli/internal/auth"
 	"github.com/seangalliher/d365-erp-cli/internal/config"
 	"github.com/seangalliher/d365-erp-cli/internal/daemon"
 )
@@ -47,8 +49,9 @@ Checks performed:
   4. DNS resolution for environment hostname
   5. TCP connectivity to environment (port 443)
   6. Auth tooling is available (az CLI for az-cli auth)
-  7. Token expiry status
-  8. Daemon status
+  7. Auth profile settings are complete (e.g., client secret env var)
+  8. Token expiry status
+  9. Daemon status
 
 Example:
   .\d365 doctor`,
@@ -74,6 +77,7 @@ func runDoctorChecks() []checkResult {
 		results = append(results, checkTCPReach(sess.Environment))
 	}
 	results = append(results, checkAuthConfig())
+	results = append(results, checkAuthProfile())
 	if sess != nil {
 		results = append(results, checkTokenExpiry(sess))
 	}
@@ -198,4 +202,48 @@ func checkDaemonStatus() checkResult {
 		return pass("daemon", "Daemon is running")
 	}
 	return pass("daemon", fmt.Sprintf("Daemon is running (PID %d)", pid))
+}
+
+func checkAuthProfile() checkResult {
+	cfg, err := config.Load()
+	if err != nil {
+		return warn("auth_profile", "Could not load config to check auth profile",
+			"Run 'd365 connect <url>' to create a config file.")
+	}
+	profile := cfg.ActiveProfile(flagProfile)
+	method := profile.AuthMethod
+	if method == "" {
+		method = auth.MethodAzCLI
+	}
+
+	switch method {
+	case auth.MethodClientCredential:
+		if os.Getenv(config.EnvClientSecret) == "" {
+			return warn("auth_profile",
+				"Profile uses client-credentials auth but D365_CLIENT_SECRET is not set",
+				"Set the D365_CLIENT_SECRET environment variable so commands can re-authenticate.\n"+
+					"  PowerShell:   $env:D365_CLIENT_SECRET = \"your-secret\"\n"+
+					"  Bash / Linux: export D365_CLIENT_SECRET=\"your-secret\"")
+		}
+		if profile.TenantID == "" {
+			return warn("auth_profile",
+				"Profile uses client-credentials auth but tenant ID is missing",
+				"Reconnect with: d365 connect <url> --auth client-credentials --tenant <id> --client-id <id> --client-secret <secret>")
+		}
+		if profile.ClientID == "" {
+			return warn("auth_profile",
+				"Profile uses client-credentials auth but client ID is missing",
+				"Reconnect with: d365 connect <url> --auth client-credentials --tenant <id> --client-id <id> --client-secret <secret>")
+		}
+		return pass("auth_profile", "Client-credentials profile OK (tenant, client ID set, secret in env)")
+	case auth.MethodBrowser, auth.MethodDeviceCode:
+		if profile.TenantID == "" || profile.ClientID == "" {
+			return warn("auth_profile",
+				fmt.Sprintf("Profile uses %s auth but tenant or client ID is missing", method),
+				fmt.Sprintf("Reconnect with: d365 connect <url> --auth %s --tenant <id> --client-id <id>", method))
+		}
+		return pass("auth_profile", fmt.Sprintf("%s profile OK (tenant, client ID set)", method))
+	default:
+		return pass("auth_profile", fmt.Sprintf("Auth method: %s (no extra config needed)", method))
+	}
 }

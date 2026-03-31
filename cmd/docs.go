@@ -82,36 +82,81 @@ var docTopics = map[string]docTopic{
 		Title: "Authentication Methods",
 		Content: `# Authentication Methods
 
+## Quick Start
+
+The fastest way to get started — if you have Azure CLI installed:
+` + "```" + `
+az login
+d365 connect https://your-env.operations.dynamics.com
+d365 data find Customers --query '$top=5&$select=CustomerAccount,Name'
+` + "```" + `
+That's it. No extra flags or configuration needed.
+
 ## Supported Auth Methods
 
-### Azure CLI (default)
+### Azure CLI (default — recommended for getting started)
 Uses your existing Azure CLI login. No additional configuration needed.
 ` + "```" + `
 az login
-.\d365 connect https://your-env.operations.dynamics.com
+d365 connect https://your-env.operations.dynamics.com
 ` + "```" + `
 
 ### Client Credentials (Service Principal)
 For CI/CD pipelines and automated scenarios.
 ` + "```" + `
-export D365_CLIENT_ID=your-app-id
+d365 connect https://your-env.operations.dynamics.com \
+  --auth client-credentials \
+  --tenant <azure-ad-tenant-id> \
+  --client-id <app-id> \
+  --client-secret <secret>
+` + "```" + `
+
+Or set environment variables first:
+` + "```" + `
 export D365_CLIENT_SECRET=your-secret
-export D365_TENANT_ID=your-tenant-id
-.\d365 connect https://your-env.operations.dynamics.com --auth client_credentials
+d365 connect https://your-env.operations.dynamics.com \
+  --auth client-credentials --tenant <id> --client-id <id> --client-secret <secret>
+` + "```" + `
+
+## How Auth Works After Connect
+
+When you run ` + "`d365 connect`" + `, the CLI saves your auth method, tenant ID,
+and client ID to your config profile (~/.d365cli/config.json). This means
+subsequent commands know how to re-authenticate automatically.
+
+**Important:** Client secrets are NEVER saved to disk for security reasons.
+If you use client-credentials auth, you must set the ` + "`D365_CLIENT_SECRET`" + `
+environment variable so subsequent commands can authenticate:
+` + "```" + `
+# PowerShell
+$env:D365_CLIENT_SECRET = "your-secret"
+
+# Bash / Linux / macOS
+export D365_CLIENT_SECRET="your-secret"
 ` + "```" + `
 
 ## Environment Variables
 - ` + "`D365_URL`" + ` - Default environment URL
-- ` + "`D365_AUTH_METHOD`" + ` - Auth method (az_cli, client_credentials)
+- ` + "`D365_AUTH_METHOD`" + ` - Auth method (az-cli, client-credentials, browser, device-code, managed-identity)
 - ` + "`D365_TENANT_ID`" + ` - Azure AD tenant ID (find in Azure Portal > Microsoft Entra ID, not the D365 environment ID)
 - ` + "`D365_CLIENT_ID`" + ` - Application (client) ID
-- ` + "`D365_CLIENT_SECRET`" + ` - Client secret
+- ` + "`D365_CLIENT_SECRET`" + ` - Client secret (required for client-credentials, not saved to disk)
 - ` + "`D365_COMPANY`" + ` - Default company/legal entity
 
 ## Token Management
 - Tokens are cached in the session file and refreshed automatically.
-- Use ` + "`.\\/d365 status`" + ` to check token expiry.
-- Run ` + "`.\\/d365 connect`" + ` again to refresh credentials.
+- Use ` + "`d365 status`" + ` to check token expiry.
+- Run ` + "`d365 connect`" + ` again to refresh credentials.
+
+## Troubleshooting
+
+**"Commands fail after a successful connect"**
+If you used --auth client-credentials, the secret is not saved to disk.
+Set D365_CLIENT_SECRET as an environment variable before running commands.
+
+**"tenant is required for browser auth"**
+This means the CLI doesn't know which auth method to use. Run
+` + "`d365 connect`" + ` again with the correct --auth flag, or set D365_AUTH_METHOD.
 `,
 	},
 
