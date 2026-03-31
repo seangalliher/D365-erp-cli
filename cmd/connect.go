@@ -109,7 +109,12 @@ func runConnect(cmd *cobra.Command, args []string) error {
 
 	// Validate the connection by acquiring a token.
 	ctx := context.Background()
-	token, err := authenticator.GetD365Token(ctx)
+	var token *auth.TokenResult
+	err = withSpinner("Authenticating...", func() error {
+		var authErr error
+		token, authErr = authenticator.GetD365Token(ctx)
+		return authErr
+	})
 	if err != nil {
 		cliErr := errors.AsCLIError(err)
 		RenderError(cmd, cliErr.ToErrorInfo(), start)

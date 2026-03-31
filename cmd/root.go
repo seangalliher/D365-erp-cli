@@ -275,6 +275,24 @@ func banner() string {
 		"\033[2m  kubectl for Dynamics 365 Finance & Operations" + r + "          \033[1;32m" + version + r + "\n\n"
 }
 
+// spinnerSuppressed returns true when the spinner should be silent.
+func spinnerSuppressed() bool {
+	flagMu.RLock()
+	q, ci := flagQuiet, flagCI
+	flagMu.RUnlock()
+	return !output.IsTerminal(os.Stderr) || q || ci
+}
+
+// withSpinner wraps a blocking call with a stderr spinner.
+func withSpinner(message string, fn func() error) error {
+	return output.WithSpinner(spinnerSuppressed(), message, fn)
+}
+
+// newSpinner creates a spinner for multi-step operations.
+func newSpinner() *output.Spinner {
+	return output.NewSpinner(spinnerSuppressed())
+}
+
 func goVersion() string {
 	return runtime.Version()
 }

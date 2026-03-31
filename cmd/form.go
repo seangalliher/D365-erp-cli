@@ -65,7 +65,12 @@ func sendFormCommand(command string, args interface{}) (json.RawMessage, error) 
 	}
 	defer func() { _ = client.Close() }()
 
-	resp, err := client.SendCommand(command, args)
+	var resp *daemon.Response
+	err = withSpinner("Processing...", func() error {
+		var sendErr error
+		resp, sendErr = client.SendCommand(command, args)
+		return sendErr
+	})
 	if err != nil {
 		return nil, err
 	}

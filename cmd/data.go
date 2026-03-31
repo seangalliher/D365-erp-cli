@@ -214,7 +214,12 @@ entity name (e.g., "chart accounts" matches LedgerChartOfAccounts).`,
 			oc := client.NewODataClient(sess.Environment, tp, time.Duration(flagTimeout)*time.Second)
 			oc.SetVerbose(flagVerbose)
 
-			matches, err := oc.FindEntityTypes(cmd.Context(), searchTerm, top)
+			var matches interface{}
+			err = withSpinner("Searching entity types...", func() error {
+				var findErr error
+				matches, findErr = oc.FindEntityTypes(cmd.Context(), searchTerm, top)
+				return findErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
@@ -275,7 +280,12 @@ indicate which metadata sections are desired.`,
 			oc := client.NewODataClient(sess.Environment, tp, time.Duration(flagTimeout)*time.Second)
 			oc.SetVerbose(flagVerbose)
 
-			metadata, err := oc.GetMetadata(cmd.Context())
+			var metadata interface{}
+			err = withSpinner("Fetching metadata...", func() error {
+				var metaErr error
+				metadata, metaErr = oc.GetMetadata(cmd.Context())
+				return metaErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
@@ -374,7 +384,12 @@ PowerShell: use single quotes for --query to avoid $ being interpreted:
 			oc := client.NewODataClient(sess.Environment, tp, time.Duration(flagTimeout)*time.Second)
 			oc.SetVerbose(flagVerbose)
 
-			result, err := oc.QueryEntities(cmd.Context(), odataPath, opts)
+			var result interface{}
+			err = withSpinner("Querying entities...", func() error {
+				var queryErr error
+				result, queryErr = oc.QueryEntities(cmd.Context(), odataPath, opts)
+				return queryErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
@@ -433,7 +448,12 @@ func newCreateCmd() *cobra.Command {
 			oc := client.NewODataClient(sess.Environment, tp, time.Duration(flagTimeout)*time.Second)
 			oc.SetVerbose(flagVerbose)
 
-			result, err := oc.CreateEntity(cmd.Context(), odataPath, data)
+			var result interface{}
+			err = withSpinner("Creating entity...", func() error {
+				var createErr error
+				result, createErr = oc.CreateEntity(cmd.Context(), odataPath, data)
+				return createErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
@@ -497,8 +517,12 @@ The --data flag accepts a JSON array of objects, each with:
 			oc.SetVerbose(flagVerbose)
 
 			var results []map[string]interface{}
-			for _, u := range updates {
+			spin := newSpinner()
+			spin.Start(fmt.Sprintf("Updating entities (0/%d)...", len(updates)))
+			for i, u := range updates {
+				spin.Update(fmt.Sprintf("Updating entity %d/%d...", i+1, len(updates)))
 				if err := oc.UpdateEntity(cmd.Context(), u.ODataPath, u.UpdatedFieldValues); err != nil {
+					spin.Stop()
 					e := clierrors.AsCLIError(err)
 					RenderError(cmd, e.ToErrorInfo(), start)
 					return nil
@@ -508,6 +532,7 @@ The --data flag accepts a JSON array of objects, each with:
 					"status":    "updated",
 				})
 			}
+			spin.Stop()
 
 			RenderSuccess(cmd, map[string]interface{}{
 				"updated": len(results),
@@ -576,8 +601,12 @@ The --paths flag accepts a JSON array of OData paths to delete.`,
 			oc.SetVerbose(flagVerbose)
 
 			var results []map[string]interface{}
-			for _, p := range paths {
+			spin := newSpinner()
+			spin.Start(fmt.Sprintf("Deleting entities (0/%d)...", len(paths)))
+			for i, p := range paths {
+				spin.Update(fmt.Sprintf("Deleting entity %d/%d...", i+1, len(paths)))
 				if err := oc.DeleteEntity(cmd.Context(), p); err != nil {
+					spin.Stop()
 					e := clierrors.AsCLIError(err)
 					RenderError(cmd, e.ToErrorInfo(), start)
 					return nil
@@ -587,6 +616,7 @@ The --paths flag accepts a JSON array of OData paths to delete.`,
 					"status":    "deleted",
 				})
 			}
+			spin.Stop()
 
 			RenderSuccess(cmd, map[string]interface{}{
 				"deleted": len(results),

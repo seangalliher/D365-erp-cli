@@ -70,7 +70,12 @@ The search is performed against the D365 custom service discovery endpoint.`,
 				return nil
 			}
 
-			result, err := apiFindActions(cmd.Context(), sess.Environment, tp, searchTerm)
+			var result interface{}
+			err = withSpinner("Searching actions...", func() error {
+				var findErr error
+				result, findErr = apiFindActions(cmd.Context(), sess.Environment, tp, searchTerm)
+				return findErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
@@ -160,7 +165,12 @@ Use --company to override the default company context for the invocation.`,
 				company = GetCompany()
 			}
 
-			result, err := apiInvokeAction(cmd.Context(), sess.Environment, tp, actionName, params, company)
+			var result interface{}
+			err = withSpinner("Invoking action...", func() error {
+				var invokeErr error
+				result, invokeErr = apiInvokeAction(cmd.Context(), sess.Environment, tp, actionName, params, company)
+				return invokeErr
+			})
 			if err != nil {
 				e := clierrors.AsCLIError(err)
 				RenderError(cmd, e.ToErrorInfo(), start)
