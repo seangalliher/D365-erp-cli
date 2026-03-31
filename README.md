@@ -23,12 +23,41 @@
 - **Background daemon** — stateful form sessions with auto-start and idle timeout
 - **Cross-platform** — Windows, macOS, Linux (amd64 + arm64)
 
+## Installation
+
+### Download pre-built binary (recommended)
+
+Grab the latest release for your platform from [GitHub Releases](https://github.com/seangalliher/d365-erp-cli/releases):
+
+| Platform | File |
+|----------|------|
+| Windows (x64) | `d365_*_windows_amd64.zip` |
+| Windows (ARM) | `d365_*_windows_arm64.zip` |
+| macOS (Apple Silicon) | `d365_*_darwin_arm64.tar.gz` |
+| macOS (Intel) | `d365_*_darwin_amd64.tar.gz` |
+| Linux (x64) | `d365_*_linux_amd64.tar.gz` |
+| Linux (ARM) | `d365_*_linux_arm64.tar.gz` |
+
+Extract the archive and place `d365` (or `d365.exe`) somewhere on your PATH.
+
+### Install with Go
+
+```bash
+go install github.com/seangalliher/d365-erp-cli@latest
+```
+
+### Build from source
+
+```bash
+git clone https://github.com/seangalliher/d365-erp-cli.git
+cd d365-erp-cli
+go build -o d365.exe .    # Windows
+# go build -o d365 .      # macOS / Linux
+```
+
 ## Quick Start
 
 ```bash
-# Install (requires Go 1.26+)
-go install github.com/seangalliher/d365-erp-cli@latest
-
 # Interactive guided setup
 d365 quickstart
 
