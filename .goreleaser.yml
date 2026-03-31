@@ -28,12 +28,13 @@ builds:
 
 archives:
   - id: default
-    builds:
+    ids:
       - d365
     format: tar.gz
     format_overrides:
       - goos: windows
-        format: zip
+        formats:
+          - zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - LICENSE
@@ -61,8 +62,9 @@ release:
 
 nfpms:
   - id: packages
-    builds:
+    ids:
       - d365
+    maintainer: Sean Galliher <seangalliher@users.noreply.github.com>
     vendor: seangalliher
     homepage: https://github.com/seangalliher/d365-erp-cli
     description: CLI for Dynamics 365 Finance & Operations
@@ -72,14 +74,11 @@ nfpms:
       - rpm
     bindir: /usr/local/bin
 
-brews:
+scoops:
   - name: d365
     repository:
       owner: seangalliher
-      name: homebrew-tap
-    directory: Formula
+      name: scoop-d365
     homepage: https://github.com/seangalliher/d365-erp-cli
     description: CLI for Dynamics 365 Finance & Operations
     license: MIT
-    ids:
-      - d365

@@ -40,6 +40,13 @@ Grab the latest release for your platform from [GitHub Releases](https://github.
 
 Extract the archive and place `d365` (or `d365.exe`) somewhere on your PATH.
 
+### Install with Scoop (Windows)
+
+```powershell
+scoop bucket add d365 https://github.com/seangalliher/scoop-d365
+scoop install d365
+```
+
 ### Install with Go
 
 ```bash
