@@ -120,8 +120,8 @@ func (c *Client) Send(req *Request) (*Response, error) {
 		return nil, clierrors.DaemonError("failed to send command to daemon", err)
 	}
 
-	// Read response
-	if err := c.conn.SetReadDeadline(time.Now().Add(60 * time.Second)); err != nil {
+	// Read response — allow up to 5 minutes for initial login + form load.
+	if err := c.conn.SetReadDeadline(time.Now().Add(5 * time.Minute)); err != nil {
 		return nil, fmt.Errorf("cannot set read deadline: %w", err)
 	}
 	scanner := bufio.NewScanner(c.conn)

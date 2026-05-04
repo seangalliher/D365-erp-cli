@@ -20,7 +20,7 @@
 - **AI system prompt** — `d365 agent-prompt` generates a complete tool description for agents
 - **Self-diagnosing** — `d365 doctor` checks config, auth, DNS, connectivity, and daemon health
 - **Batch mode** — JSONL pipeline for multi-command execution
-- **Background daemon** — stateful form sessions with auto-start and idle timeout
+- **Background daemon** — stateful form sessions via Playwright-driven headless browser with auto-start, cookie caching, and idle timeout
 - **Cross-platform** — Windows, macOS, Linux (amd64 + arm64)
 
 ## Installation
@@ -87,7 +87,7 @@ d365 status
 | **Connection** | `connect`, `disconnect`, `status`, `company` | Authentication and session management |
 | **Data** | `find-type`, `metadata`, `find`, `create`, `update`, `delete` | OData CRUD operations |
 | **API** | `find`, `invoke` | Discover and invoke D365 actions |
-| **Forms** | `open`, `close`, `state`, `click`, `set`, `lookup`, `tab`, `filter`, `grid-*` | Stateful form automation |
+| **Forms** | `open`, `close`, `state`, `click`, `set`, `save`, `lookup`, `tab`, `filter`, `grid-*`, `find-controls` | Stateful form automation via headless browser |
 | **Utilities** | `quickstart`, `doctor`, `agent-prompt`, `schema`, `docs`, `batch`, `version` | Setup, diagnostics, AI integration |
 
 See [docs/commands.md](docs/commands.md) for the full command reference.
@@ -159,7 +159,11 @@ graph TB
         direction TB
         Server[IPC Server<br/><i>TCP :51365</i>]
         DClient[Daemon Client]
+        FormHandler[Form Handler<br/><i>Playwright + Chromium</i>]
+        Cookies[Cookie Cache<br/><i>session persistence</i>]
         Server --- DClient
+        Server --> FormHandler
+        FormHandler --> Cookies
     end
 
     CLI --> Core
@@ -167,7 +171,7 @@ graph TB
 
     Client --> D365[(D365 F&O<br/>OData / API)]
     Auth --> Entra[Microsoft Entra ID]
-    Server --> D365
+    FormHandler --> D365Web[(D365 F&O<br/>Web Client)]
 
     classDef primary fill:#2563eb,stroke:#1d4ed8,color:#fff
     classDef service fill:#7c3aed,stroke:#6d28d9,color:#fff
@@ -176,7 +180,7 @@ graph TB
 
     class CLI primary
     class Core,Daemon service
-    class D365,Entra external
+    class D365,Entra,D365Web external
     class User user
 ```
 
@@ -192,6 +196,7 @@ d365 (single binary)
 │   ├── config/    Configuration and session management
 │   ├── daemon/    IPC server/client for form sessions
 │   ├── errors/    Structured error types with suggestions
+│   ├── formhandler/ Playwright-based D365 form automation
 │   ├── guardrails/ AI safety rules engine
 │   └── output/    Renderer (JSON, table, CSV, raw) + TTY detection
 └── pkg/types/     Shared types (Response, ErrorInfo, etc.)

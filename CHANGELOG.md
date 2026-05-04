@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Form daemon powered by Playwright** — headless Chromium browser automation replaces the previous stub handler
+  - Creates, reads, and interacts with D365 forms via the actual web client
+  - Playwright's `Type()` with character-by-character input for Knockout.js data binding
+  - Playwright's `Click()` with `Force` option for D365 action pane and dialog buttons
+  - Session cookie caching (`~/.d365cli/session-cookies.json`) — skips AAD login on daemon restart (~5s vs ~2min)
+  - Persistent browser profile (`~/.d365cli/browser-profile/`) for SSO cookie reuse
+  - Eager browser warmup at daemon start — login completes before accepting commands
+  - Save verification with infolog/dialog error detection
+  - Dialog dismissal before navigation (handles "Discard changes?" prompts)
+  - Shell noise filtering in form state extraction (excludes D365 chrome controls)
+  - ReactList grid column detection for D365's modern grid component
+- Client read deadline increased to 5 minutes (from 60s) for initial login + form load
+- Accept loop fix — daemon no longer spins on closed connection errors
+
+### Changed
+- Replaced `go-rod/rod` with `playwright-community/playwright-go` for browser automation
+  - Playwright handles actionability checks, modal overlays, and Knockout.js bindings natively
+  - No more Windows Defender false positives (rod's `leakless.exe` issue)
+- Form state extraction scoped to `[data-dyn-role="Form"]` element, filtering out 100+ shell noise controls
+
+### Previous
 - Connection management: `connect`, `disconnect`, `status`, `company get/set`
 - OData operations: `find-type`, `metadata`, `find`, `create`, `update`, `delete`
 - API discovery and invocation: `api find`, `api invoke`

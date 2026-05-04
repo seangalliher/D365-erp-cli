@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -118,6 +119,10 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 				case <-s.done:
 					return
 				default:
+					// Check if the listener was closed (not a transient error).
+					if strings.Contains(err.Error(), "use of closed") {
+						return
+					}
 					s.logger.Printf("accept error: %v", err)
 					continue
 				}

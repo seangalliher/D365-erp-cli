@@ -77,7 +77,13 @@ d365 api invoke <action> --params '{"key":"value"}'  # Invoke an action
 
 ## Forms (Stateful)
 
-Form commands require the background daemon, which auto-starts on first use.
+Form commands drive the actual D365 web client via a Playwright-powered background daemon. The daemon launches a Chromium browser, authenticates to your D365 environment, and executes form interactions exactly as a human user would — clicking buttons, typing into fields, and reading form state from the DOM.
+
+**How it works:**
+1. The daemon auto-starts on first `d365 form` command
+2. On first run, a visible browser opens for AAD login (SSO cookies are cached for subsequent runs)
+3. Each CLI command sends a request to the daemon via IPC, which drives the browser
+4. Form state (controls, values, grids) is extracted from the D365 DOM and returned as JSON
 
 ```bash
 # Navigation
@@ -101,6 +107,34 @@ d365 form grid-filter <col> <val> --grid Grid1     # Filter grid column
 d365 form grid-select <row> --grid Grid1           # Select grid row
 d365 form grid-sort <col> --grid Grid1 --direction Descending
 ```
+
+### Example: Create a Customer via Form
+
+```bash
+# Start daemon (auto-starts on first form command)
+d365 daemon start
+
+# Open the Customers form
+d365 form open CustTable --type Display
+
+# Click New to open the create dialog
+d365 form click NewCustomer
+
+# Fill in the dialog fields
+d365 form set DynamicHeader_AccountNum="CUST001"
+d365 form set Org_Name="Contoso Ltd"
+d365 form set DynamicDetail_CustGroup="10"
+
+# Save (clicks the Save button on the dialog)
+d365 form save
+
+# Verify via OData
+d365 data find Customers --query '$filter=CustomerAccount eq ''CUST001'''
+```
+
+### Cookie Caching
+
+The daemon caches D365 session cookies to `~/.d365cli/session-cookies.json`. On subsequent daemon starts, these cookies are restored so the browser can skip the AAD login flow entirely — reducing startup from ~2 minutes to ~5 seconds.
 
 ## Utilities
 

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -12,7 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/seangalliher/d365-erp-cli/internal/config"
 	"github.com/seangalliher/d365-erp-cli/internal/daemon"
+	"github.com/seangalliher/d365-erp-cli/internal/formhandler"
 )
 
 func init() {
@@ -158,13 +159,36 @@ func runDaemonForeground(idleTimeoutSec int) error {
 		_ = os.WriteFile(pidPath, []byte(strconv.Itoa(os.Getpid())), 0600)
 	}
 
-	handler := daemon.HandlerFunc(stubHandler)
+	// Load session to get environment URL and company.
+	sess, err := config.LoadSession()
+	if err != nil || !sess.Connected || sess.Environment == "" {
+		return fmt.Errorf("no active D365 session — run 'd365 connect <url>' first")
+	}
+
+	// Create the browser-based form handler.
+	fh, err := formhandler.New(formhandler.Config{
+		EnvURL:  sess.Environment,
+		Company: sess.Company,
+		Visible: true, // Visible for login; goes headless once session is cached.
+	})
+	if err != nil {
+		return fmt.Errorf("cannot create form handler: %w", err)
+	}
+	defer fh.Close()
+
+	// Eagerly start the browser session so login happens before any
+	// commands are sent. This avoids client read deadline timeouts.
+	fmt.Fprintln(os.Stderr, "[d365-daemon] starting browser session (complete login if prompted)...")
+	if err := fh.WarmUp(context.Background()); err != nil {
+		return fmt.Errorf("browser session failed to start: %w", err)
+	}
+	fmt.Fprintln(os.Stderr, "[d365-daemon] browser session ready")
 
 	cfg := daemon.ServerConfig{
 		IdleTimeout: time.Duration(idleTimeoutSec) * time.Second,
 	}
 
-	srv := daemon.NewServer(handler, cfg)
+	srv := daemon.NewServer(fh, cfg)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -178,10 +202,4 @@ func runDaemonForeground(idleTimeoutSec int) error {
 	}()
 
 	return srv.ListenAndServe(ctx)
-}
-
-// stubHandler is a placeholder handler that returns a stub response.
-// In a full deployment, this bridges to the D365 MCP server or REST API.
-func stubHandler(ctx context.Context, command string, args json.RawMessage) (json.RawMessage, error) {
-	return nil, fmt.Errorf("command %q: daemon handler not configured — connect a D365 backend", command)
 }
